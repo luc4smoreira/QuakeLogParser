@@ -50,7 +50,13 @@ public class GameServiceImp implements GameService{
 
         PlayerDTO playerDTO = currentMatch.getPlayers().get(id);
         if (playerDTO != null) {
-            throw new PlayerAlreadyExists(id);
+
+            if(playerDTO.isConnected()) {
+                throw new PlayerAlreadyExists(id);
+            }
+            else {
+                playerDTO.setConnected(true);
+            }
         }
         currentMatch.getPlayers().put(id, new PlayerDTO());
 

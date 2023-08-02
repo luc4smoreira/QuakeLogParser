@@ -18,10 +18,10 @@ public interface GameService {
 
 
     /***
-     * Add a new player to the game with a new Id
+     * Add a new player to the game with a new Id or reconnect a disconnected player with the same id
      *
      * @param id Player id, unique
-     * @throws PlayerAlreadyExists Throws if the game already have this player id
+     * @throws PlayerAlreadyExists Throws if the game already have this player id *connected*
      */
     void playerConnect(int id) throws PlayerAlreadyExists;
 

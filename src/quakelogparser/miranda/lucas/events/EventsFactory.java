@@ -23,7 +23,7 @@ public class EventsFactory {
                 case EXIT -> {
                 }
                 case CLIENT_CONNECT, CLIENT_BEGIN, CLIENT_DISCONNECT-> {
-
+                    //there will be only one parameter it is the player id
 
                     int playerId = Integer.parseInt(rawParamsTrim);
 
@@ -43,6 +43,10 @@ public class EventsFactory {
 
                 }
                 case CLIENT_USERINFO_CHANGED -> {
+                    //rawParamsTrim example:
+                    //2 n\Dono da Bola\t\0\model\sarge/krusade\hmodel\sarge/krusade\g_redteam\\g_blueteam\\c1\5\c2\5\hc\95\w\0\l\0\tt\0\tl\0
+
+
                 }
 
                 case ITEM -> {
