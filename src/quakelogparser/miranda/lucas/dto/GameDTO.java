@@ -13,11 +13,21 @@ public class GameDTO {
         players = new HashMap<>();
     }
 
-    public Map<Integer, PlayerDTO> getPlayers() {
-        return players;
+
+
+    public PlayerDTO getPlayerById(int id) {
+        return players.get(id);
     }
 
-    public void setPlayers(Map<Integer, PlayerDTO> players) {
-        this.players = players;
+    public void addNewPlayer(int id) {
+        PlayerDTO playerDTO = new PlayerDTO();
+        playerDTO.setId(id);
+        players.put(id, playerDTO);
+    }
+
+    public void printPlayers() {
+        for(PlayerDTO playerDTO : players.values()) {
+            System.out.println(String.format("id: %d name: %s", playerDTO.getId(), playerDTO.getName()));
+        }
     }
 }

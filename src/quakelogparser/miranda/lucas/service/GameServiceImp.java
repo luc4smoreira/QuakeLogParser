@@ -25,7 +25,7 @@ public class GameServiceImp implements GameService{
     @Override
     public void initGame() {
         if(currentMatch!=null) {
-            matches.add(currentMatch);
+            archiveCurrentGame();
         }
         currentMatch = new GameDTO();
         totalGames++;
@@ -36,7 +36,7 @@ public class GameServiceImp implements GameService{
         validate();
 
         if(currentMatch!=null) {
-            matches.add(currentMatch);
+            archiveCurrentGame();
         }
         else {
             throw new RuntimeException();
@@ -44,11 +44,22 @@ public class GameServiceImp implements GameService{
         currentMatch = null;
     }
 
+    private void archiveCurrentGame() {
+        if(currentMatch!=null) {
+            System.out.println("-- archiving last game ....");
+            System.out.println(" ===== Players:");
+            currentMatch.printPlayers();
+            System.out.println(" ===== ");
+
+            matches.add(currentMatch);
+        }
+    }
+
     @Override
     public void playerConnect(int id) throws PlayerAlreadyExists {
         validate();
 
-        PlayerDTO playerDTO = currentMatch.getPlayers().get(id);
+        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if (playerDTO != null) {
 
             if(playerDTO.isConnected()) {
@@ -58,20 +69,27 @@ public class GameServiceImp implements GameService{
                 playerDTO.setConnected(true);
             }
         }
-        currentMatch.getPlayers().put(id, new PlayerDTO());
+        else {
+            currentMatch.addNewPlayer(id);
+        }
 
     }
 
     @Override
     public void playerUpdate(int id, String name) throws PlayerDoesntExist {
         validate();
+        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
+        if(playerDTO == null) {
+            throw new PlayerDoesntExist(id);
+        }
+        playerDTO.setName(name);
     }
 
     @Override
     public void playerDisconnect(int id) throws PlayerDoesntExist {
         validate();
 
-        PlayerDTO playerDTO = currentMatch.getPlayers().get(id);
+        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if(playerDTO == null) {
             throw new PlayerDoesntExist(id);
         }
@@ -83,7 +101,7 @@ public class GameServiceImp implements GameService{
     public void playerBegin(int id) throws PlayerDoesntExist {
         validate();
 
-        PlayerDTO playerDTO = currentMatch.getPlayers().get(id);
+        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if(playerDTO == null) {
             throw new PlayerDoesntExist(id);
         }

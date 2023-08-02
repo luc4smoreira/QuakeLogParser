@@ -2,10 +2,7 @@ package quakelogparser.miranda.lucas.parser;
 
 import quakelogparser.miranda.lucas.Main;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
-import quakelogparser.miranda.lucas.events.ClientBeginEvent;
-import quakelogparser.miranda.lucas.events.ClientConnectEvent;
-import quakelogparser.miranda.lucas.events.ClientDisconnectEvent;
-import quakelogparser.miranda.lucas.events.EventsFactory;
+import quakelogparser.miranda.lucas.events.*;
 import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
@@ -84,6 +81,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
                                 }
                                 case CLIENT_USERINFO_CHANGED -> {
+                                    ClientUserinfoChangedEvent clientUserinfoChangedEvent = (ClientUserinfoChangedEvent) logLine;
+                                    gameService.playerUpdate(clientUserinfoChangedEvent.getPlayerId(), clientUserinfoChangedEvent.getName());
                                 }
 
                                 case ITEM -> {
