@@ -17,7 +17,7 @@ public class GameServiceImp implements GameService{
 
     private GameDTO currentMatch;
 
-    private static final int WORLD_KILLER_ID = 1022;
+    public static final int WORLD_KILLER_ID = 1022;
 
     private static final int SCORE_SUICIDE = -1;
     private static final int SCORE_NORMAL_KILL = 1;
@@ -126,12 +126,12 @@ public class GameServiceImp implements GameService{
 
         if(idKiller==WORLD_KILLER_ID) {
             playerVictimDTO.addKills(SCORE_SUICIDE);
-            currentMatch.addKill();
+            currentMatch.addKill(meansOfDeath);
         }
         else {
             PlayerDTO playerKillerDTO = getAndValidatePlayerInTheGame(idKiller);
             playerKillerDTO.addKills(SCORE_NORMAL_KILL);
-            currentMatch.addKill();
+            currentMatch.addKill(meansOfDeath);
         }
     }
 
@@ -147,8 +147,8 @@ public class GameServiceImp implements GameService{
     }
 
     @Override
-    public void debug() {
-        System.out.println(String.format("total games: %d", totalGames));
+    public GameDTO getCurrentGameData() {
+        return currentMatch;
     }
 
     private void validateMatch() {

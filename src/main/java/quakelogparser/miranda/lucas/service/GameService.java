@@ -1,5 +1,6 @@
 package quakelogparser.miranda.lucas.service;
 
+import quakelogparser.miranda.lucas.dto.GameDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
@@ -63,5 +64,5 @@ public interface GameService {
      */
     void playerKill(int idKiller, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame;
 
-    void debug();
+    GameDTO getCurrentGameData();
 }

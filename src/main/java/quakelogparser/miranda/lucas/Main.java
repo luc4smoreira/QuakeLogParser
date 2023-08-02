@@ -10,7 +10,7 @@ public class Main {
 
         QuakeLogParser quakeLogParser = new QuakeLogParserImp();
         GameService gameService = quakeLogParser.parseFile("test1.log");
-        gameService.debug();
+
 
     }
 }
