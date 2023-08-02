@@ -24,12 +24,17 @@ public class QuakeLogParser implements IQuakeLogParser {
         try (br) {
             String rawLine = br.readLine();
 
+
             //read each line, one by one, until the end
             for(int line = 1; rawLine != null; line++) {
+
                 try {
                     rawLine = rawLine.trim(); //remove spaces at beginning and end
                     if(!rawLine.isEmpty()) {
                         LogLine logLine = parseLine(rawLine);
+
+                        //TODO check new games and update data
+
 
 
                         if(line > 10) {
@@ -83,10 +88,9 @@ public class QuakeLogParser implements IQuakeLogParser {
         LogEventTypeEnum type = null;
         eventType = eventType.replace(":", "");
 
+        //linear search, it´s not the best FIXME
         for(LogEventTypeEnum logEventTypeEnum : LogEventTypeEnum.values()) {
-            System.out.println(" eventType:"+eventType+ " comparando com:"+ logEventTypeEnum.getValue());
             if(eventType.equalsIgnoreCase(logEventTypeEnum.getValue())) {
-                System.out.println(" ==> Achou tipo:"+ logEventTypeEnum.getValue());
                 break;
             }
         }
