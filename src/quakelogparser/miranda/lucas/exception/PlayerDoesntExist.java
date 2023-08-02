@@ -2,7 +2,7 @@ package quakelogparser.miranda.lucas.exception;
 
 public class PlayerDoesntExist extends Exception {
 
-    public PlayerDoesntExist(String message) {
-        super(message);
+    public PlayerDoesntExist(int playerId) {
+        super(String.format("This player id doesn´t exist in the game: %d", playerId));
     }
 }

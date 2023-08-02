@@ -2,7 +2,12 @@ package quakelogparser.miranda.lucas.parser;
 
 import quakelogparser.miranda.lucas.Main;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
+import quakelogparser.miranda.lucas.events.ClientBeginEvent;
+import quakelogparser.miranda.lucas.events.ClientConnectEvent;
+import quakelogparser.miranda.lucas.events.ClientDisconnectEvent;
+import quakelogparser.miranda.lucas.events.EventsFactory;
 import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
+import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
 import quakelogparser.miranda.lucas.service.GameService;
@@ -56,6 +61,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                         LogLine logLine = parseLine(rawLine);
 
                         if(logLine!=null && logLine.getType()!=null) {
+
                             switch (logLine.getType()) {
                                 case INIT_GAME -> {
                                     gameService.initGame();
@@ -63,17 +69,27 @@ public class QuakeLogParserImp implements QuakeLogParser {
                                 case SHUT_DOWN_GAME -> {
                                     gameService.shutDownGame();
                                 }
-                                case EXIT -> {
-                                    //do nothing
-                                }
+
                                 case CLIENT_CONNECT -> {
+                                    ClientConnectEvent clientConnectEvent = (ClientConnectEvent) logLine;
+                                    gameService.playerConnect(clientConnectEvent.getPlayerId());
+                                }
+                                case CLIENT_BEGIN -> {
+                                    ClientBeginEvent clientBeginEvent = (ClientBeginEvent) logLine;
+                                    gameService.playerBegin(clientBeginEvent.getPlayerId());
+                                }
+                                case CLIENT_DISCONNECT -> {
+                                    ClientDisconnectEvent clientDisconnectEvent = (ClientDisconnectEvent) logLine;
+                                    gameService.playerDisconnect(clientDisconnectEvent.getPlayerId());
 
                                 }
                                 case CLIENT_USERINFO_CHANGED -> {
                                 }
-                                case CLIENT_BEGIN -> {
-                                }
+
                                 case ITEM -> {
+                                    //do nothing
+                                }
+                                case EXIT -> {
                                     //do nothing
                                 }
                                 case KILL -> {
@@ -98,6 +114,10 @@ public class QuakeLogParserImp implements QuakeLogParser {
                 }
                 catch (CorruptedLogLine e) {
                     String message = String.format("Warning: Line %d looks corrupted. %s", line, e.getMessage());
+                    System.out.println(message);
+                }
+                catch (PlayerAlreadyExists | PlayerDoesntExist  e) {
+                    String message = String.format("Error: Line %d has a problem. %s", line, e.getMessage());
                     System.out.println(message);
                 }
                 rawLine = br.readLine();
@@ -127,25 +147,18 @@ public class QuakeLogParserImp implements QuakeLogParser {
                 logLine.setRawData(rawLine);
 
                 logLine.setTime(time);
-                String eventType = parts[1]; // event type
 
-
-                LogEventTypeEnum logEventTypeEnum = readEventType(eventType);
-
-
+                LogEventTypeEnum logEventTypeEnum = readEventType(parts[1]);  // event type
 
                 //It can be just a line with -------
                 if(logEventTypeEnum!=null) {
+
                     logLine.setType(logEventTypeEnum);
 
-//                    //if it has params
-//                    if (parts.length == 3) {
-//                        List<String> params = getEventParams(parts[2], logEventTypeEnum);
-//
-//                        for (String param : params) {
-//                            logLine.addEventParam(param);
-//                        }
-//                    }
+                    //if it has params
+                    if (parts.length == 3) {
+                        logLine = EventsFactory.createEvent(logLine, parts[2]);
+                    }
                 }
 
 
@@ -172,21 +185,6 @@ public class QuakeLogParserImp implements QuakeLogParser {
         return type;
     }
 
-    private List<String> getEventParams(String rawParams, LogEventTypeEnum typeEnum) {
-        List<String> params = new ArrayList<>();
-
-
-//        if(typeEnum.equals(LogEventTypeEnum.KILL)) {
-//            String[] parts = rawParams.split(":", 2);
-//
-//            String part = parts[0].trim();
-//            part.split(" ")
-//
-//        }
-
-        return params;
-
-    }
 
 
 }

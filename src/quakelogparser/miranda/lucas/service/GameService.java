@@ -12,7 +12,7 @@ public interface GameService {
     void initGame();
 
     /**
-     * Shut down the current game
+     * Shut down the current game and disconnect all players
      */
     void shutDownGame();
 
