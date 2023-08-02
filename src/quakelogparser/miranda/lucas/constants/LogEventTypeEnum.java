@@ -7,7 +7,9 @@ public enum LogEventTypeEnum {
     CLIENT_CONNECT("ClientConnect"),
     CLIENT_USERINFO_CHANGED("ClientUserinfoChanged"),
     CLIENT_BEGIN("ClientBegin"),
+    CLIENT_DISCONNECT("ClientDisconnect"),
     ITEM("Item"),
+
     KILL("Kill");
 
 

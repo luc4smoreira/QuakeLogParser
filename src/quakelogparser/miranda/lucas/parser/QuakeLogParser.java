@@ -1,5 +1,7 @@
 package quakelogparser.miranda.lucas.parser;
 
-public interface QuakeLogParser {
+import quakelogparser.miranda.lucas.service.GameService;
 
+public interface QuakeLogParser {
+    GameService parseFile(final String fileName);
 }

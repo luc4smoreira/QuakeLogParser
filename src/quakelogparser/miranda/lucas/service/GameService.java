@@ -1,14 +1,67 @@
 package quakelogparser.miranda.lucas.service;
 
+import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
+import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
+import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
+
 public interface GameService {
 
+    /**
+     * Initilize a new game
+     */
     void initGame();
 
+    /**
+     * Shut down the current game
+     */
     void shutDownGame();
 
-    void addPlayer(int id);
 
-    void updatePlayer(String name);
+    /***
+     * Add a new player to the game with a new Id
+     *
+     * @param id Player id, unique
+     * @throws PlayerAlreadyExists Throws if the game already have this player id
+     */
+    void playerConnect(int id) throws PlayerAlreadyExists;
 
-    void killPlayer(int idVictim, int meansOfDeath, Integer killer);
+
+    /**
+     * Update the name associated with the player defined by the id
+     * @param id Player id
+     * @param name New name
+     * @throws PlayerDoesntExist Throws if the player is not connected
+     */
+    void playerUpdate(int id, String name) throws PlayerDoesntExist;
+
+
+    /**
+     * Disconnect player from game and remove player id so it can be used by a new player
+     *
+     * @param id Player ud
+     * @throws PlayerDoesntExist
+     */
+    void playerDisconnect(int id) throws PlayerDoesntExist;
+
+    /**
+     * Allow player to kill or be killed
+     *
+     * @param id Player id already connected
+     * @throws PlayerDoesntExist Throws if the player is not connected
+     */
+    void playerBegin(int id) throws PlayerDoesntExist;
+
+
+    /**
+     * Kill a player
+     *
+     * @param killer Killer player id or 1022 for World
+     * @param idVictim Victim player id
+     * @param meansOfDeath How the victim died
+     * @throws PlayerDoesntExist If some player id is not connected
+     * @throws PlayerIsNotInTheGame If some player id didn´t call begin
+     */
+    void playerKill(int killer, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame;
+
+    void debug();
 }
