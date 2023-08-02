@@ -1,6 +1,8 @@
 package quakelogparser.miranda.lucas.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameDTO {
@@ -30,10 +32,21 @@ public class GameDTO {
         players.put(id, playerDTO);
     }
 
-    public void printPlayers() {
+    public List<String> getPlayersNames() {
+        List<String> playersNames = new ArrayList<>();
         for(PlayerDTO playerDTO : players.values()) {
-            System.out.println(String.format("id: %d name: %s kills: %d", playerDTO.getId(), playerDTO.getName(), playerDTO.getKills()));
+            playersNames.add(playerDTO.getName());
         }
+        return playersNames;
+    }
+
+    public Map<String, Integer> getPlayersNamesWithKills() {
+        Map<String, Integer> playersKills = new HashMap<>();
+
+        for(PlayerDTO playerDTO : players.values()) {
+            playersKills.put(playerDTO.getName(), playerDTO.getKills());
+        }
+        return playersKills;
     }
 
     public void addKill(int meansOfDeath) {
@@ -52,5 +65,19 @@ public class GameDTO {
 
     }
 
+    public Map<Integer, PlayerDTO> getPlayers() {
+        return players;
+    }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getTotalKills() {
+        return totalKills;
+    }
 }

@@ -1,9 +1,12 @@
 package quakelogparser.miranda.lucas.service;
 
 import quakelogparser.miranda.lucas.dto.GameDTO;
+import quakelogparser.miranda.lucas.dto.GameReportDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
+
+import java.util.Map;
 
 public interface GameService {
 
@@ -65,4 +68,8 @@ public interface GameService {
     void playerKill(int idKiller, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame;
 
     GameDTO getCurrentGameData();
+
+
+    Map<String, GameReportDTO> generateMatchesReport();
+
 }

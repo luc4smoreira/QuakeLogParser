@@ -1,6 +1,7 @@
 package quakelogparser.miranda.lucas.service;
 
 import quakelogparser.miranda.lucas.dto.GameDTO;
+import quakelogparser.miranda.lucas.dto.GameReportDTO;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.exception.NoGameInitialized;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
@@ -8,19 +9,19 @@ import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GameServiceImp implements GameService{
-
+public class GameServiceImp implements GameService {
     private List<GameDTO> matches;
-    private int totalGames;
-
     private GameDTO currentMatch;
 
     public static final int WORLD_KILLER_ID = 1022;
 
     private static final int SCORE_SUICIDE = -1;
     private static final int SCORE_NORMAL_KILL = 1;
+    private static final String REPORT_MATCH_PREFIX = "game_";
 
     public GameServiceImp(){
         matches = new ArrayList<>();
@@ -33,7 +34,7 @@ public class GameServiceImp implements GameService{
             archiveCurrentGame();
         }
         currentMatch = new GameDTO();
-        totalGames++;
+        currentMatch.setId(matches.size()+1);
     }
 
     @Override
@@ -51,11 +52,6 @@ public class GameServiceImp implements GameService{
 
     private void archiveCurrentGame() {
         if(currentMatch!=null) {
-            System.out.println("-- archiving last game ....");
-            System.out.println(" ===== Players:");
-            currentMatch.printPlayers();
-            System.out.println(" ===== ");
-
             matches.add(currentMatch);
         }
     }
@@ -156,4 +152,36 @@ public class GameServiceImp implements GameService{
             throw new NoGameInitialized();
         }
     }
+
+
+    @Override
+    public Map<String, GameReportDTO> generateMatchesReport() {
+        Map<String, GameReportDTO> reports = new LinkedHashMap();
+
+        for(GameDTO gameDTO : matches) {
+
+//            "game_1": {
+//                "total_kills": 45,
+//                "players": ["Dono da bola", "Isgalamido", "Zeh"],
+//                "kills": {
+//                    "Dono da bola": 5,
+//                     "Isgalamido": 18,
+//                     "Zeh": 20
+//                }
+//            }
+
+
+            GameReportDTO gameReportDTO = new GameReportDTO();
+
+            gameReportDTO.setTotalKills(gameDTO.getTotalKills());
+            gameReportDTO.setPlayers(gameDTO.getPlayersNames());
+            gameReportDTO.setKills(gameDTO.getPlayersNamesWithKills());
+
+            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), gameReportDTO);
+        }
+        return reports;
+    }
+
+
+
 }

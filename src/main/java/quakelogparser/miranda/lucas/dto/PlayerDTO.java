@@ -7,7 +7,6 @@ public class PlayerDTO {
     private boolean connected;
     private boolean begin;
 
-
     public int getId() {
         return id;
     }
