@@ -6,8 +6,10 @@ import java.util.Map;
 public class GameDTO {
     private int id;
     private boolean shutdown;
-    private boolean error;
+    private int errors;
     private Map<Integer, PlayerDTO> players;
+
+    private int totalKills;
 
     public GameDTO() {
         players = new HashMap<>();
@@ -27,7 +29,13 @@ public class GameDTO {
 
     public void printPlayers() {
         for(PlayerDTO playerDTO : players.values()) {
-            System.out.println(String.format("id: %d name: %s", playerDTO.getId(), playerDTO.getName()));
+            System.out.println(String.format("id: %d name: %s kills: %d", playerDTO.getId(), playerDTO.getName(), playerDTO.getKills()));
         }
     }
+
+    public void addKill() {
+        totalKills++;
+    }
+
+
 }

@@ -92,6 +92,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
                                     //do nothing
                                 }
                                 case KILL -> {
+                                    KillEvent killEvent = (KillEvent) logLine;
+                                    gameService.playerKill(killEvent.getKiller(), killEvent.getVictim(), killEvent.getMeansOfDeath());
 //                                try {
 //                                    int killer = getParamAsInteger(logLine.getEventParam(0));
 //                                    int victim = getParamAsInteger(logLine.getEventParam(1));
@@ -115,7 +117,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                     String message = String.format("Warning: Line %d looks corrupted. %s", line, e.getMessage());
                     System.out.println(message);
                 }
-                catch (PlayerAlreadyExists | PlayerDoesntExist  e) {
+                catch (PlayerAlreadyExists | PlayerDoesntExist | PlayerIsNotInTheGame e) {
                     String message = String.format("Error: Line %d has a problem. %s", line, e.getMessage());
                     System.out.println(message);
                 }
@@ -129,47 +131,47 @@ public class QuakeLogParserImp implements QuakeLogParser {
         return gameService;
     }
 
-    private int getParamAsInteger(String param) {
-        return Integer.parseInt(param);
-    }
-
-    private LogLine parseLine(String rawLine) throws CorruptedLogLine {
+    @Override
+    public LogLine parseLine(String rawLine) throws CorruptedLogLine {
         LogLine logLine = null;
 
-        String[] parts = rawLine.split(" ", 3);
+        rawLine = rawLine.trim(); //remove spaces at beginning and end
 
-        if (parts.length >= 2) {
-            String time = parts[0]; // time
+        if(!rawLine.isEmpty()) {
 
-            if(time.contains(":")) {
-                logLine = new LogLine();
-                logLine.setRawData(rawLine);
+            String[] parts = rawLine.split(" ", 3);
 
-                logLine.setTime(time);
+            if (parts.length >= 2) {
+                String time = parts[0]; // time
 
-                LogEventTypeEnum logEventTypeEnum = readEventType(parts[1]);  // event type
+                if (time.contains(":")) {
+                    logLine = new LogLine();
+                    logLine.setRawData(rawLine);
 
-                //It can be just a line with -------
-                if(logEventTypeEnum!=null) {
+                    logLine.setTime(time);
 
-                    logLine.setType(logEventTypeEnum);
+                    LogEventTypeEnum logEventTypeEnum = readEventType(parts[1]);  // event type
 
-                    //if it has params
-                    if (parts.length == 3) {
-                        logLine = EventsFactory.createEvent(logLine, parts[2]);
+                    //It can be just a line with -------
+                    if (logEventTypeEnum != null) {
+
+                        logLine.setType(logEventTypeEnum);
+
+                        //if it has params
+                        if (parts.length == 3) {
+                            logLine = EventsFactory.createEvent(logLine, parts[2]);
+                        }
                     }
+
+
+                } else {
+                    //invalid log, time invalid
+                    throw new CorruptedLogLine("Invalid log line, time invalid: " + rawLine);
                 }
-
-
+            } else {
+                //data incomplete, only time? doesnt matter
+                throw new CorruptedLogLine("Invalid log line, incomplete data: " + rawLine);
             }
-            else {
-                //invalid log, time invalid
-                throw new CorruptedLogLine("Invalid log line, time invalid: "+rawLine);
-            }
-        }
-        else {
-            //data incomplete, only time? doesnt matter
-            throw new CorruptedLogLine("Invalid log line, incomplete data: "+rawLine);
         }
         return logLine;
     }

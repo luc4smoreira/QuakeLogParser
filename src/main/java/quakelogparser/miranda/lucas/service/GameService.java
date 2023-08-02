@@ -36,7 +36,7 @@ public interface GameService {
 
 
     /**
-     * Disconnect player from game and remove player id so it can be used by a new player
+     * Disconnect player from game
      *
      * @param id Player ud
      * @throws PlayerDoesntExist
@@ -55,13 +55,13 @@ public interface GameService {
     /**
      * Kill a player
      *
-     * @param killer Killer player id or 1022 for World
+     * @param idKiller Killer player id or 1022 for World
      * @param idVictim Victim player id
      * @param meansOfDeath How the victim died
      * @throws PlayerDoesntExist If some player id is not connected
      * @throws PlayerIsNotInTheGame If some player id didn´t call begin
      */
-    void playerKill(int killer, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame;
+    void playerKill(int idKiller, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame;
 
     void debug();
 }

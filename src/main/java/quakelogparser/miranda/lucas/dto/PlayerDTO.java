@@ -3,8 +3,10 @@ package quakelogparser.miranda.lucas.dto;
 public class PlayerDTO {
     private int id;
     private String name;
+    private int kills;
     private boolean connected;
     private boolean begin;
+
 
     public int getId() {
         return id;
@@ -36,5 +38,13 @@ public class PlayerDTO {
 
     public void setBegin(boolean begin) {
         this.begin = begin;
+    }
+
+    public void addKills(int value) {
+        this.kills+=value;
+    }
+
+    public int getKills() {
+        return kills;
     }
 }

@@ -17,6 +17,11 @@ public class GameServiceImp implements GameService{
 
     private GameDTO currentMatch;
 
+    private static final int WORLD_KILLER_ID = 1022;
+
+    private static final int SCORE_SUICIDE = -1;
+    private static final int SCORE_NORMAL_KILL = 1;
+
     public GameServiceImp(){
         matches = new ArrayList<>();
 
@@ -33,7 +38,7 @@ public class GameServiceImp implements GameService{
 
     @Override
     public void shutDownGame() {
-        validate();
+        validateMatch();
 
         if(currentMatch!=null) {
             archiveCurrentGame();
@@ -57,7 +62,7 @@ public class GameServiceImp implements GameService{
 
     @Override
     public void playerConnect(int id) throws PlayerAlreadyExists {
-        validate();
+        validateMatch();
 
         PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if (playerDTO != null) {
@@ -77,7 +82,7 @@ public class GameServiceImp implements GameService{
 
     @Override
     public void playerUpdate(int id, String name) throws PlayerDoesntExist {
-        validate();
+        validateMatch();
         PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if(playerDTO == null) {
             throw new PlayerDoesntExist(id);
@@ -87,7 +92,7 @@ public class GameServiceImp implements GameService{
 
     @Override
     public void playerDisconnect(int id) throws PlayerDoesntExist {
-        validate();
+        validateMatch();
 
         PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if(playerDTO == null) {
@@ -99,7 +104,7 @@ public class GameServiceImp implements GameService{
 
     @Override
     public void playerBegin(int id) throws PlayerDoesntExist {
-        validate();
+        validateMatch();
 
         PlayerDTO playerDTO = currentMatch.getPlayerById(id);
         if(playerDTO == null) {
@@ -109,8 +114,36 @@ public class GameServiceImp implements GameService{
     }
 
     @Override
-    public void playerKill(int killer, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame {
-        validate();
+    public void playerKill(int idKiller, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame {
+        validateMatch();
+
+
+        //When <world> kill a player, that player loses -1 kill score.
+        //Since <world> is not a player, it should not appear in the list of players or in the dictionary of kills.
+        //The counter total_kills includes player and world deaths.
+
+        PlayerDTO playerVictimDTO = getAndValidatePlayerInTheGame(idVictim);
+
+        if(idKiller==WORLD_KILLER_ID) {
+            playerVictimDTO.addKills(SCORE_SUICIDE);
+            currentMatch.addKill();
+        }
+        else {
+            PlayerDTO playerKillerDTO = getAndValidatePlayerInTheGame(idKiller);
+            playerKillerDTO.addKills(SCORE_NORMAL_KILL);
+            currentMatch.addKill();
+        }
+    }
+
+    private PlayerDTO getAndValidatePlayerInTheGame(int id) throws PlayerDoesntExist, PlayerIsNotInTheGame{
+        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
+        if(playerDTO == null) {
+            throw new PlayerDoesntExist(id);
+        }
+        if(!playerDTO.isConnected() || !playerDTO.isBegin()) {
+            throw new PlayerIsNotInTheGame(id);
+        }
+        return playerDTO;
     }
 
     @Override
@@ -118,7 +151,7 @@ public class GameServiceImp implements GameService{
         System.out.println(String.format("total games: %d", totalGames));
     }
 
-    private void validate() {
+    private void validateMatch() {
         if(currentMatch==null) {
             throw new NoGameInitialized();
         }

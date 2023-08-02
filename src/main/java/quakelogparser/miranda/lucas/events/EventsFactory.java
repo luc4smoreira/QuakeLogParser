@@ -71,6 +71,22 @@ public class EventsFactory {
                 case ITEM -> {
                 }
                 case KILL -> {
+                    //7:15 Kill: 1022 2 22: <world> killed Isgalamido by MOD_TRIGGER_HURT
+                    //rawParamsTrim example:"1022 2 22: <world> killed Isgalamido by MOD_TRIGGER_HURT"
+
+                    String[] parts = rawParamsTrim.split(":", 2);
+                    String[] params = parts[0].split(" ");
+                    if(params.length==3) {
+                        int killer = Integer.parseInt(params[0]);
+                        int victim = Integer.parseInt(params[1]);
+                        int meansOfDeath = Integer.parseInt(params[2]);
+
+                        event = new KillEvent(killer, victim, meansOfDeath);
+
+                    }
+                    //else {
+                    //invalid
+                    //}
                 }
             }
         }
