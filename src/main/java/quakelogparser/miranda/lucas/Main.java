@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
 
         QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("qgames.log");
+        GameService gameService = quakeLogParser.parseFile("test1.log");
         gameService.debug();
 
     }
