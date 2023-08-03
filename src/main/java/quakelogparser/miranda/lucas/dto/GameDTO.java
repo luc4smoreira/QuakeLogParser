@@ -31,10 +31,10 @@ public class GameDTO {
         players.put(id, playerConnectionDTO);
     }
 
-    public List<String> getPlayersNames() {
+    public List<String> getPlayersLastNames() {
         List<String> playersNames = new ArrayList<>();
         for(PlayerConnectionDTO playerConnectionDTO : players.values()) {
-            playersNames.add(playerConnectionDTO.getName());
+            playersNames.add(playerConnectionDTO.getNameWhenConnected());
         }
         return playersNames;
     }
@@ -54,7 +54,7 @@ public class GameDTO {
         Collections.sort(playersList, ReportComparatorProvider.getComparatorPlayerByKills());
 
         for(PlayerConnectionDTO playerConnectionDTO : playersList) {
-            playersKills.put(playerConnectionDTO.getName(), playerConnectionDTO.getKills());
+            playersKills.put(playerConnectionDTO.getNameWhenConnected(), playerConnectionDTO.getKills());
         }
 
         return playersKills;

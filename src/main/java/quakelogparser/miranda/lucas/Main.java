@@ -24,8 +24,8 @@ public class Main {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         System.out.println(gson.toJson(reportGame));
-        System.out.println(gson.toJson(reportMeans));
-        System.out.println(gson.toJson(ranking));
+        //System.out.println(gson.toJson(reportMeans));
+        //System.out.println(gson.toJson(ranking));
 
 
     }

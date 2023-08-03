@@ -1,9 +1,13 @@
 package quakelogparser.miranda.lucas.parser;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
+import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.dto.ReportGameDTO;
 import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
+import quakelogparser.miranda.lucas.dto.ReportRankingDTO;
 import quakelogparser.miranda.lucas.events.ClientUserinfoChangedEvent;
 import quakelogparser.miranda.lucas.events.KillEvent;
 import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
@@ -14,8 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 
 class QuakeLogParserImpTest {
 
@@ -130,6 +133,45 @@ class QuakeLogParserImpTest {
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(2, reportGame.size());
+
+
+    }
+
+    @Test
+    public void testParseFileTest5() {
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        GameService gameService = quakeLogParser.parseFile("test5.log");
+
+
+        Map<String, ReportGameDTO> reportWithGames = gameService.generateMatchesReport();
+        assertEquals(1, reportWithGames.size());
+
+        ReportGameDTO reportGameDTO = reportWithGames.values().iterator().next();
+
+        ReportRankingDTO reportRankingDTO = gameService.generateRanking();
+
+        assertEquals(3, reportGameDTO.getTotal_kills());
+        assertEquals(1, reportGameDTO.getKills().get("Isgalamido"));
+        assertEquals(-1, reportGameDTO.getKills().get("Mal"));
+        assertEquals(1, reportGameDTO.getKills().get("Zeh"));
+
+        assertEquals(reportGameDTO.getPlayers().size(), reportRankingDTO.getRanking().size());
+
+        //players in matchreport
+        for(PlayerDTO playerDTO : reportRankingDTO.getRanking().values()) {
+            assertTrue(reportGameDTO.getPlayers().contains(playerDTO.getName()), String.format("$s is not present in game report", playerDTO.getName()));
+        }
+
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+
+
+        System.out.println(gson.toJson(reportWithGames));
+        System.out.println(gson.toJson(reportRankingDTO));
+
+
+
 
 
     }

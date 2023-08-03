@@ -16,6 +16,7 @@ public class RankingServiceImp implements RankingService{
 
     @Override
     public void addPlayerIfDoenstExists(String name) {
+        System.out.print("Add player: "+name);
 
         PlayerDTO playerDTO = players.get(name);
 
@@ -24,11 +25,18 @@ public class RankingServiceImp implements RankingService{
             playerDTO.setName(name);
 
             players.put(name, playerDTO);
+
+            System.out.println(" NEW");
+        }
+        else {
+            System.out.println(" Exist");
         }
     }
 
     @Override
     public void updateName(String oldName, String name) throws PlayerDoesntExist, PlayerAlreadyExists {
+        System.out.print("Update name old:"+oldName+" new:"+name);
+
         if(oldName.compareTo(name)!=0) {
 
             PlayerDTO playerDTO = players.get(oldName);
@@ -36,22 +44,40 @@ public class RankingServiceImp implements RankingService{
                 throw new PlayerDoesntExist(oldName);
             }
 
+            playerDTO.setName(name);
+            players.remove(oldName);
+
+
             //if ranking already have an user with with this name
             if (players.containsKey(name)) {
-                throw new PlayerAlreadyExists(name);
+
+                //check if there was some score for the old user if so merge the kills
+                if(playerDTO.getKills()!=0) {
+                    //merge kills
+                    System.out.println(" MERGED!");
+                    players.get(name).addKills(playerDTO.getKills());
+                }
+                else {
+                    System.out.println(" NO CHANGES");
+                }
+                //else it will just keep the existent user without changes
+            }
+            else {
+                //update the map with the new key
+                players.put(name, playerDTO);
+                System.out.println(" UPDATED!");
             }
 
-            playerDTO.setName(name);
-
-            //update the map with the new key
-            players.remove(oldName);
-            players.put(name, playerDTO);
+        }
+        else {
+            System.out.println(" **SAME NAME **");
         }
 
     }
 
     @Override
     public void addPlayerKillScore(String name, int value) throws PlayerDoesntExist {
+        System.out.println(" addPlayerKillScore: "+name);
         PlayerDTO playerDTO = players.get(name);
         if(playerDTO == null) {
             throw new PlayerDoesntExist(name);

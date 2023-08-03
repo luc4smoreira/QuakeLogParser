@@ -29,7 +29,6 @@ public class GameServiceImp implements GameService {
 
     @Override
     public void initGame() {
-        System.out.println("init game: "+matches.size());
 
         currentMatch = new GameDTO();
         matches.add(currentMatch);
@@ -45,7 +44,6 @@ public class GameServiceImp implements GameService {
 
     @Override
     public void playerConnect(int id) throws PlayerAlreadyExists {
-        System.out.println("playerConnect:"+id);
         validateMatch();
 
         PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
@@ -86,6 +84,7 @@ public class GameServiceImp implements GameService {
 
 
         playerConnectionDTO.setName(name);
+        playerConnectionDTO.setNameWhenConnected(name);
     }
 
     @Override
@@ -98,6 +97,8 @@ public class GameServiceImp implements GameService {
         }
         playerConnectionDTO.setConnected(false);
         playerConnectionDTO.setBegin(false);
+        playerConnectionDTO.setName(null); //IMPORTANT! Clear the name to keep the ranking correct
+
     }
 
     @Override
@@ -180,7 +181,7 @@ public class GameServiceImp implements GameService {
             ReportGameDTO reportGameDTO = new ReportGameDTO();
 
             reportGameDTO.setTotal_kills(gameDTO.getTotalKills());
-            reportGameDTO.setPlayers(gameDTO.getPlayersNames());
+            reportGameDTO.setPlayers(gameDTO.getPlayersLastNames());
             reportGameDTO.setKills(gameDTO.getPlayersNamesWithKillsSorted());
 
             reports.put(GameConstantValues.REPORT_MATCH_PREFIX+gameDTO.getId(), reportGameDTO);

@@ -6,6 +6,7 @@ import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.events.*;
 import quakelogparser.miranda.lucas.exception.*;
+import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 import quakelogparser.miranda.lucas.service.GameService;
 import quakelogparser.miranda.lucas.service.GameServiceImp;
 
@@ -83,8 +84,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                             }
                         }
                         else {
-                            //if there is a line empty or with ------
-                            // process the data
+                            //if there is a line empty or no type like (----) so process the data
                             processLogsSameTime(batchLogsByTime, gameService);
                             batchLogsByTime.clear(); //clear the list
                         }
@@ -116,12 +116,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
     public void processLogsSameTime(List<LogLine> logsGroupedByTime, GameService gameService) {
 
         if(logsGroupedByTime!=null && logsGroupedByTime.size() > 1) {
-            Collections.sort(logsGroupedByTime, new Comparator<LogLine>() {
-                @Override
-                public int compare(LogLine o1, LogLine o2) {
-                    return Integer.compare(o1.getType().getPriority(), o2.getType().getPriority());
-                }
-            });
+            Collections.sort(logsGroupedByTime, ReportComparatorProvider.getComparadorLogLinesByType());
         }
 
         for(LogLine logLine : logsGroupedByTime) {

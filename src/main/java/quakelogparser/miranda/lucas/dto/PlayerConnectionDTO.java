@@ -6,6 +6,8 @@ public class PlayerConnectionDTO extends PlayerDTO {
     private boolean connected;
     private boolean begin;
 
+    private String nameWhenConnected;
+
 
     public int getId() {
         return id;
@@ -31,5 +33,11 @@ public class PlayerConnectionDTO extends PlayerDTO {
         this.begin = begin;
     }
 
+    public String getNameWhenConnected() {
+        return nameWhenConnected;
+    }
 
+    public void setNameWhenConnected(String nameWhenConnected) {
+        this.nameWhenConnected = nameWhenConnected;
+    }
 }
