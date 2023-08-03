@@ -1,6 +1,7 @@
 package quakelogparser.miranda.lucas.service;
 
 import org.junit.jupiter.api.Test;
+import quakelogparser.miranda.lucas.constants.GameConstantValues;
 import quakelogparser.miranda.lucas.dto.GameDTO;
 import quakelogparser.miranda.lucas.dto.PlayerConnectionDTO;
 import quakelogparser.miranda.lucas.dto.ReportGameDTO;
@@ -22,7 +23,7 @@ class GameServiceTest {
             gameService.initGame();
             gameService.playerConnect(1);
             gameService.playerBegin(1);
-            gameService.playerKill(GameServiceImp.WORLD_KILLER_ID, 1, 22);
+            gameService.playerKill(GameConstantValues.WORLD_KILLER_ID, 1, 22);
 
             gameService.playerConnect(2);
             gameService.playerBegin(2);

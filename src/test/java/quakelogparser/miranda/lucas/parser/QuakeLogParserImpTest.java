@@ -84,6 +84,45 @@ class QuakeLogParserImpTest {
 
     }
 
+
+    @Test
+    public void testParseFileTest2() {
+        final String namePlayer2 = "Isgalamido";
+        final String namePlayer3 = "Mocinha";
+        final String namePlayer4 = "Zeh";
+
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        GameService gameService = quakeLogParser.parseFile("test2.log");
+
+        Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
+        assertEquals(1, reportGame.size());
+        for(ReportGameDTO reportGameDTO : reportGame.values()) {
+            assertEquals(3, reportGameDTO.getPlayers().size());
+            assertEquals(11, reportGameDTO.getTotal_kills());
+
+            assertEquals(namePlayer2, reportGameDTO.getPlayers().get(0));
+            assertEquals(namePlayer3, reportGameDTO.getPlayers().get(1));
+            assertEquals(namePlayer4, reportGameDTO.getPlayers().get(2));
+        }
+
+    }
+
+
+
+    @Test
+    public void testParseFileTest3() {
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        GameService gameService = quakeLogParser.parseFile("test3.log");
+
+        Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
+        assertEquals(1, reportGame.size());
+        for(ReportGameDTO reportGameDTO : reportGame.values()) {
+            assertEquals(7, reportGameDTO.getPlayers().size());
+            assertEquals(60, reportGameDTO.getTotal_kills());
+        }
+
+    }
+
     @Test
     public void testBatch() {
         try {

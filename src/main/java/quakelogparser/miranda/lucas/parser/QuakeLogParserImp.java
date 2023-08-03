@@ -1,7 +1,9 @@
 package quakelogparser.miranda.lucas.parser;
 
 import quakelogparser.miranda.lucas.Main;
+import quakelogparser.miranda.lucas.constants.GameConstantValues;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
+import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.events.*;
 import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
@@ -9,6 +11,8 @@ import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
 import quakelogparser.miranda.lucas.service.GameService;
 import quakelogparser.miranda.lucas.service.GameServiceImp;
+import quakelogparser.miranda.lucas.service.RankingService;
+import quakelogparser.miranda.lucas.service.RankingServiceImp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +24,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
 
     private Map<String, LogEventTypeEnum> allowedEventTypes;
-    ;
+
+    private RankingService rankingService;
 
     public QuakeLogParserImp() {
         allowedEventTypes = new HashMap<>();
@@ -28,6 +33,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
         for(LogEventTypeEnum eventType : LogEventTypeEnum.values()) {
             allowedEventTypes.put(eventType.getValue(), eventType);
         }
+
+        rankingService = new RankingServiceImp();
 
     }
 
@@ -137,7 +144,20 @@ public class QuakeLogParserImp implements QuakeLogParser {
                     }
                     case CLIENT_USERINFO_CHANGED -> {
                         ClientUserinfoChangedEvent clientUserinfoChangedEvent = (ClientUserinfoChangedEvent) logLine;
+
+
+                        PlayerDTO playerDTO = gameService.getPlayerById(clientUserinfoChangedEvent.getPlayerId());
+                        String oldName = playerDTO.getName();
+                        //if the old name is null so add the player to the ranking
+                        if(oldName==null || oldName.isEmpty()) {
+                            rankingService.addPlayerIfDoenstExists(clientUserinfoChangedEvent.getName());
+                        }
+                        else {
+                            rankingService.updateName(oldName, clientUserinfoChangedEvent.getName());
+                        }
+
                         gameService.playerUpdate(clientUserinfoChangedEvent.getPlayerId(), clientUserinfoChangedEvent.getName());
+
                     }
 
                     case ITEM -> {
@@ -149,6 +169,16 @@ public class QuakeLogParserImp implements QuakeLogParser {
                     case KILL -> {
                         KillEvent killEvent = (KillEvent) logLine;
                         gameService.playerKill(killEvent.getKiller(), killEvent.getVictim(), killEvent.getMeansOfDeath());
+
+
+                        if(killEvent.getKiller() == GameConstantValues.WORLD_KILLER_ID) {
+                            PlayerDTO playerDTO = gameService.getPlayerById(killEvent.getVictim());
+                            rankingService.addPlayerKillScore(playerDTO.getName(), GameConstantValues.SCORE_SUICIDE);
+                        }
+                        else {
+                            PlayerDTO playerDTO = gameService.getPlayerById(killEvent.getKiller());
+                            rankingService.addPlayerKillScore(playerDTO.getName(), GameConstantValues.SCORE_NORMAL_KILL);
+                        }
                     }
 
                 }

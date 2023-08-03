@@ -1,6 +1,7 @@
 package quakelogparser.miranda.lucas.service;
 
 import quakelogparser.miranda.lucas.dto.GameDTO;
+import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.dto.ReportGameDTO;
 import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
@@ -74,5 +75,7 @@ public interface GameService {
     Map<String, ReportGameDTO> generateMatchesReport();
 
     Map<String, ReportKillsByMeansDTO> generateKillByMeansReport();
+
+    PlayerDTO getPlayerById(int id);
 
 }

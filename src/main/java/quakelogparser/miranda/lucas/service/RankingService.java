@@ -1,18 +1,28 @@
 package quakelogparser.miranda.lucas.service;
 
+import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 
 public interface RankingService {
 
     /**
-     * Add the player to the ranking, ignore if they is already exists
+     * Add the player to the ranking, ignore if already exists.
      *
-     * @param id player id
+     * @param name player name
      */
-    void addPlayer(int id);
+    void addPlayerIfDoenstExists(String name) throws PlayerDoesntExist, PlayerAlreadyExists;
 
-    void updateName(int id, String name) throws PlayerDoesntExist;
 
-    void addPlayerKillScore(int id, int value);
+    /**
+     * Update the user name in the ranking
+     *
+     * @param oldName cant be null
+     * @param name new name
+     * @throws PlayerDoesntExist
+     * @throws PlayerAlreadyExists
+     */
+    void updateName(String oldName, String name) throws PlayerDoesntExist, PlayerAlreadyExists;
+
+    void addPlayerKillScore(String name, int value) throws PlayerDoesntExist;
 
 }

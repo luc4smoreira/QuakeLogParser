@@ -1,34 +1,63 @@
 package quakelogparser.miranda.lucas.service;
 
-import quakelogparser.miranda.lucas.dto.PlayerConnectionDTO;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
+import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RankingServiceImp implements RankingService{
-    private Map<Integer, PlayerDTO> players;
+    private Map<String, PlayerDTO> players;
 
-    @Override
-    public void addPlayer(int id) {
-        if(!players.containsKey(id)) {
-            players.put(id, new PlayerDTO());
-        }
+    public RankingServiceImp() {
+        players = new HashMap<>();
     }
 
     @Override
-    public void updateName(int id, String name) throws PlayerDoesntExist {
-        PlayerDTO playerDTO = players.get(id);
-        if(playerDTO!=null) {
+    public void addPlayerIfDoenstExists(String name) {
+
+        PlayerDTO playerDTO = players.get(name);
+
+        if(playerDTO==null) {
+            playerDTO = new PlayerDTO();
             playerDTO.setName(name);
-        }
-        else {
-            throw new PlayerDoesntExist(id);
+
+            players.put(name, new PlayerDTO());
         }
     }
 
     @Override
-    public void addPlayerKillScore(int id, int value) {
+    public void updateName(String oldName, String name) throws PlayerDoesntExist, PlayerAlreadyExists {
+        if(oldName.compareTo(name)!=0) {
 
+            PlayerDTO playerDTO = players.get(oldName);
+            if (playerDTO == null) {
+                throw new PlayerDoesntExist(oldName);
+            }
+
+            //if ranking already have an user with with this name
+            if (players.containsKey(name)) {
+                throw new PlayerAlreadyExists(name);
+            }
+
+            playerDTO.setName(name);
+
+            //update the map with the new key
+            players.remove(oldName);
+            players.put(name, playerDTO);
+        }
+
+    }
+
+    @Override
+    public void addPlayerKillScore(String name, int value) throws PlayerDoesntExist {
+        PlayerDTO playerDTO = players.get(name);
+        if(playerDTO == null) {
+            throw new PlayerDoesntExist(name);
+        }
+
+        playerDTO.addKills(value);
     }
 }

@@ -1,9 +1,7 @@
 package quakelogparser.miranda.lucas.service;
 
-import quakelogparser.miranda.lucas.dto.GameDTO;
-import quakelogparser.miranda.lucas.dto.ReportGameDTO;
-import quakelogparser.miranda.lucas.dto.PlayerConnectionDTO;
-import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
+import quakelogparser.miranda.lucas.constants.GameConstantValues;
+import quakelogparser.miranda.lucas.dto.*;
 import quakelogparser.miranda.lucas.exception.NoGameInitialized;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
@@ -19,11 +17,7 @@ public class GameServiceImp implements GameService {
     private List<GameDTO> matches;
     private GameDTO currentMatch;
 
-    public static final int WORLD_KILLER_ID = 1022;
 
-    private static final int SCORE_SUICIDE = -1;
-    private static final int SCORE_NORMAL_KILL = 1;
-    private static final String REPORT_MATCH_PREFIX = "game_";
 
     public GameServiceImp(){
         matches = new ArrayList<>();
@@ -108,13 +102,13 @@ public class GameServiceImp implements GameService {
 
         PlayerConnectionDTO playerVictimDTO = getAndValidatePlayerInTheGame(idVictim);
 
-        if(idKiller==WORLD_KILLER_ID) {
-            playerVictimDTO.addKills(SCORE_SUICIDE);
+        if(idKiller== GameConstantValues.WORLD_KILLER_ID) {
+            playerVictimDTO.addKills(GameConstantValues.SCORE_SUICIDE);
             currentMatch.addKill(meansOfDeath);
         }
         else {
             PlayerConnectionDTO playerKillerDTO = getAndValidatePlayerInTheGame(idKiller);
-            playerKillerDTO.addKills(SCORE_NORMAL_KILL);
+            playerKillerDTO.addKills(GameConstantValues.SCORE_NORMAL_KILL);
             currentMatch.addKill(meansOfDeath);
         }
     }
@@ -165,7 +159,7 @@ public class GameServiceImp implements GameService {
             reportGameDTO.setPlayers(gameDTO.getPlayersNames());
             reportGameDTO.setKills(gameDTO.getPlayersNamesWithKillsSorted());
 
-            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), reportGameDTO);
+            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+gameDTO.getId(), reportGameDTO);
         }
         return reports;
     }
@@ -186,9 +180,15 @@ public class GameServiceImp implements GameService {
             ReportKillsByMeansDTO reportKillsByMeansDTO = new ReportKillsByMeansDTO();
             reportKillsByMeansDTO.setKills_by_means(gameDTO.getKillByMeansWithName());
 
-            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), reportKillsByMeansDTO);
+            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+gameDTO.getId(), reportKillsByMeansDTO);
         }
 
         return reports;
+    }
+
+    @Override
+    public PlayerDTO getPlayerById(int id) {
+        validateMatch();
+        return currentMatch.getPlayerById(id);
     }
 }
