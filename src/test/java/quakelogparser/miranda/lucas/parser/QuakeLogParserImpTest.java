@@ -124,6 +124,17 @@ class QuakeLogParserImpTest {
     }
 
     @Test
+    public void testParseFileTest4() {
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        GameService gameService = quakeLogParser.parseFile("test4.log");
+
+        Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
+        assertEquals(2, reportGame.size());
+
+
+    }
+
+    @Test
     public void testBatch() {
         try {
             QuakeLogParser quakeLogParser = new QuakeLogParserImp();

@@ -23,7 +23,7 @@ public class RankingServiceImp implements RankingService{
             playerDTO = new PlayerDTO();
             playerDTO.setName(name);
 
-            players.put(name, new PlayerDTO());
+            players.put(name, playerDTO);
         }
     }
 

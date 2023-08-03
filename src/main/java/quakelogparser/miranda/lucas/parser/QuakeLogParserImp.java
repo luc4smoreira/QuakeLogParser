@@ -5,10 +5,7 @@ import quakelogparser.miranda.lucas.constants.GameConstantValues;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.events.*;
-import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
-import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
-import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
-import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
+import quakelogparser.miranda.lucas.exception.*;
 import quakelogparser.miranda.lucas.service.GameService;
 import quakelogparser.miranda.lucas.service.GameServiceImp;
 
@@ -68,9 +65,11 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
                         LogLine logLine = parseLine(rawLine);
 
+
                         if(logLine!=null && logLine.getType()!=null) {
 
                             logLine.setLineNumber(lineNumber);
+
 
                             //if is the same time, add to the list to order the list by event type
                             if(timeLogsBatch == logLine.getTimeInSeconds()) {
@@ -78,20 +77,29 @@ public class QuakeLogParserImp implements QuakeLogParser {
                             }
                             else {
                                 processLogsSameTime(batchLogsByTime, gameService);
-
                                 batchLogsByTime.clear(); //clear the list
                                 batchLogsByTime.add(logLine); //add the log to the next batch
                                 timeLogsBatch = logLine.getTimeInSeconds(); //update the time associeated with the next batch
-
                             }
-
                         }
+                        else {
+                            //if there is a line empty or with ------
+                            // process the data
+                            processLogsSameTime(batchLogsByTime, gameService);
+                            batchLogsByTime.clear(); //clear the list
+                        }
+
 
                     }
                 }
                 catch (CorruptedLogLine e) {
-                    String message = String.format("Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
+                    String message = String.format("Validation Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
                     System.out.println(message);
+                }
+                catch (NoGameInitialized e) {
+                    String message = String.format("Error: Line %d %s", lineNumber, e.getMessage());
+                    System.out.println(message);
+                    throw e;
                 }
 
                 rawLine = br.readLine();

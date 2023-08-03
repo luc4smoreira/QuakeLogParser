@@ -2,10 +2,18 @@ package quakelogparser.miranda.lucas.dto;
 
 public class PlayerConnectionDTO extends PlayerDTO {
 
+    private int id;
     private boolean connected;
     private boolean begin;
 
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public boolean isConnected() {
         return connected;
