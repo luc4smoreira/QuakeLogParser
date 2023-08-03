@@ -1,6 +1,7 @@
 package quakelogparser.miranda.lucas.dto;
 
 import quakelogparser.miranda.lucas.constants.MeansOfDeathEnum;
+import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 
 import java.util.*;
 
@@ -50,12 +51,7 @@ public class GameDTO {
         }
 
         //Sort the list, because it is a ranking
-        Collections.sort(playersList, new Comparator<PlayerConnectionDTO>() {
-            @Override
-            public int compare(PlayerConnectionDTO o1, PlayerConnectionDTO o2) {
-                return Integer.compare(o2.getKills(), o1.getKills());
-            }
-        });
+        Collections.sort(playersList, ReportComparatorProvider.getComparatorPlayerByKills());
 
         for(PlayerConnectionDTO playerConnectionDTO : playersList) {
             playersKills.put(playerConnectionDTO.getName(), playerConnectionDTO.getKills());

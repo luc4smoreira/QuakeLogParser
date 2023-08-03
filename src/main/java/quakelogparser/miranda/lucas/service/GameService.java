@@ -1,9 +1,6 @@
 package quakelogparser.miranda.lucas.service;
 
-import quakelogparser.miranda.lucas.dto.GameDTO;
-import quakelogparser.miranda.lucas.dto.PlayerDTO;
-import quakelogparser.miranda.lucas.dto.ReportGameDTO;
-import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
+import quakelogparser.miranda.lucas.dto.*;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
@@ -38,7 +35,7 @@ public interface GameService {
      * @param name New name
      * @throws PlayerDoesntExist Throws if the player is not connected
      */
-    void playerUpdate(int id, String name) throws PlayerDoesntExist;
+    void playerUpdate(int id, String name) throws PlayerDoesntExist, PlayerAlreadyExists;
 
 
     /**
@@ -76,6 +73,10 @@ public interface GameService {
 
     Map<String, ReportKillsByMeansDTO> generateKillByMeansReport();
 
+    ReportRankingDTO generateRanking();
+
     PlayerDTO getPlayerById(int id);
+
+
 
 }

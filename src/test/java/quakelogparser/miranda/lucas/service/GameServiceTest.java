@@ -22,10 +22,12 @@ class GameServiceTest {
             GameService gameService = new GameServiceImp();
             gameService.initGame();
             gameService.playerConnect(1);
+            gameService.playerUpdate(1, "Lucas");
             gameService.playerBegin(1);
             gameService.playerKill(GameConstantValues.WORLD_KILLER_ID, 1, 22);
 
             gameService.playerConnect(2);
+            gameService.playerUpdate(2, "Miranda");
             gameService.playerBegin(2);
             GameDTO gameDTO = gameService.getCurrentGameData();
 

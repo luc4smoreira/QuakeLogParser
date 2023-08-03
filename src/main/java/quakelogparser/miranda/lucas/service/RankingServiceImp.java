@@ -3,10 +3,9 @@ package quakelogparser.miranda.lucas.service;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
+import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class RankingServiceImp implements RankingService{
     private Map<String, PlayerDTO> players;
@@ -59,5 +58,20 @@ public class RankingServiceImp implements RankingService{
         }
 
         playerDTO.addKills(value);
+    }
+
+
+    @Override
+    public List<PlayerDTO> getListOfPlayersOrderByKills() {
+
+        List<PlayerDTO> playersOrderByKills = new ArrayList<>();
+
+        for(PlayerDTO playerDTO : players.values()) {
+            playersOrderByKills.add(playerDTO);
+        }
+
+        Collections.sort(playersOrderByKills, ReportComparatorProvider.getComparatorPlayerByKills());
+
+        return playersOrderByKills;
     }
 }

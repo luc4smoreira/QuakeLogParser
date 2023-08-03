@@ -1,7 +1,10 @@
 package quakelogparser.miranda.lucas.service;
 
+import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
+
+import java.util.List;
 
 public interface RankingService {
 
@@ -24,5 +27,8 @@ public interface RankingService {
     void updateName(String oldName, String name) throws PlayerDoesntExist, PlayerAlreadyExists;
 
     void addPlayerKillScore(String name, int value) throws PlayerDoesntExist;
+
+
+    List<PlayerDTO> getListOfPlayersOrderByKills();
 
 }
