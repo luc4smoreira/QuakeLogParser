@@ -57,7 +57,7 @@ public class GameServiceImp implements GameService {
             }
         }
         else {
-            currentMatch.addNewPlayer(id);
+            currentMatch.connectPlayer(id);
         }
     }
 

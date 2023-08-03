@@ -9,31 +9,37 @@ public class GameDTO {
     private int id;
     private boolean shutdown;
     private int errors;
-    private Map<Integer, PlayerConnectionDTO> players;
+
+    //when the player is connected use id
+    private Map<Integer, PlayerConnectionDTO> playersConnected;
+
+    //when the player is not connected use name
+    private Map<String, PlayerConnectionDTO> playersHistory;
     private Map<Integer, Integer> killsByMeans;
     private int totalKills;
 
     public GameDTO() {
-        players = new HashMap<>();
+        playersConnected = new HashMap<>();
+        playersHistory = new HashMap<>();
         killsByMeans = new HashMap<>();
     }
 
 
 
     public PlayerConnectionDTO getPlayerById(int id) {
-        return players.get(id);
+        return playersConnected.get(id);
     }
 
-    public void addNewPlayer(int id) {
+    public void connectPlayer(int id) {
         PlayerConnectionDTO playerConnectionDTO = new PlayerConnectionDTO();
         playerConnectionDTO.setId(id);
         playerConnectionDTO.setConnected(true);
-        players.put(id, playerConnectionDTO);
+        playersConnected.put(id, playerConnectionDTO);
     }
 
     public List<String> getPlayersLastNames() {
         List<String> playersNames = new ArrayList<>();
-        for(PlayerConnectionDTO playerConnectionDTO : players.values()) {
+        for(PlayerConnectionDTO playerConnectionDTO : playersConnected.values()) {
             playersNames.add(playerConnectionDTO.getNameWhenConnected());
         }
         return playersNames;
@@ -46,7 +52,7 @@ public class GameDTO {
         //This list will be used to sort the players in DESC order using kills
         List<PlayerConnectionDTO> playersList = new ArrayList<>();
 
-        for(PlayerConnectionDTO playerConnectionDTO : players.values()) {
+        for(PlayerConnectionDTO playerConnectionDTO : playersConnected.values()) {
             playersList.add(playerConnectionDTO);
         }
 
@@ -94,9 +100,6 @@ public class GameDTO {
 
     }
 
-    public Map<Integer, PlayerConnectionDTO> getPlayers() {
-        return players;
-    }
 
     public int getId() {
         return id;

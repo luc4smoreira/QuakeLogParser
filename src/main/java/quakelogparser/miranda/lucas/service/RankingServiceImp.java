@@ -1,5 +1,7 @@
 package quakelogparser.miranda.lucas.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
@@ -7,7 +9,8 @@ import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 
 import java.util.*;
 
-public class RankingServiceImp implements RankingService{
+public class RankingServiceImp implements RankingService {
+    private static final Logger logger = LogManager.getLogger(RankingServiceImp.class);
     private Map<String, PlayerDTO> players;
 
     public RankingServiceImp() {
@@ -16,7 +19,6 @@ public class RankingServiceImp implements RankingService{
 
     @Override
     public void addPlayerIfDoenstExists(String name) {
-        System.out.print("Add player: "+name);
 
         PlayerDTO playerDTO = players.get(name);
 
@@ -26,16 +28,16 @@ public class RankingServiceImp implements RankingService{
 
             players.put(name, playerDTO);
 
-            System.out.println(" NEW");
+            logger.debug(String.format("Add player %s NEW", name));
         }
         else {
-            System.out.println(" Exist");
+            logger.debug(String.format("Add player %s Exist", name));
         }
     }
 
     @Override
     public void updateName(String oldName, String name) throws PlayerDoesntExist, PlayerAlreadyExists {
-        System.out.print("Update name old:"+oldName+" new:"+name);
+        logger.debug(String.format("Update name old: %s new: %s", oldName, name));
 
         if(oldName.compareTo(name)!=0) {
 
@@ -54,30 +56,31 @@ public class RankingServiceImp implements RankingService{
                 //check if there was some score for the old user if so merge the kills
                 if(playerDTO.getKills()!=0) {
                     //merge kills
-                    System.out.println(" MERGED!");
+                    logger.debug("  MERGED");
                     players.get(name).addKills(playerDTO.getKills());
                 }
                 else {
-                    System.out.println(" NO CHANGES");
+                    logger.debug(" NO CHANGES");
                 }
                 //else it will just keep the existent user without changes
             }
             else {
                 //update the map with the new key
                 players.put(name, playerDTO);
-                System.out.println(" UPDATED!");
+                logger.debug(" UPDATED!");
             }
 
         }
         else {
-            System.out.println(" **SAME NAME **");
+            logger.debug(" **SAME NAME **");
         }
 
     }
 
     @Override
     public void addPlayerKillScore(String name, int value) throws PlayerDoesntExist {
-        System.out.println(" addPlayerKillScore: "+name);
+        logger.debug(String.format(" addPlayerKillScore: %s", name));
+
         PlayerDTO playerDTO = players.get(name);
         if(playerDTO == null) {
             throw new PlayerDoesntExist(name);

@@ -1,9 +1,9 @@
 package quakelogparser.miranda.lucas.parser;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import quakelogparser.miranda.lucas.Main;
-import quakelogparser.miranda.lucas.constants.GameConstantValues;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
-import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.events.*;
 import quakelogparser.miranda.lucas.exception.*;
 import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
@@ -18,6 +18,7 @@ import java.util.*;
 
 public class QuakeLogParserImp implements QuakeLogParser {
 
+    private static final Logger logger = LogManager.getLogger(QuakeLogParserImp.class);
 
     private Map<String, LogEventTypeEnum> allowedEventTypes;
 
@@ -94,11 +95,11 @@ public class QuakeLogParserImp implements QuakeLogParser {
                 }
                 catch (CorruptedLogLine e) {
                     String message = String.format("Validation Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
-                    System.out.println(message);
+                    logger.warn(message);
                 }
                 catch (NoGameInitialized e) {
                     String message = String.format("Error: Line %d %s", lineNumber, e.getMessage());
-                    System.out.println(message);
+                    logger.error(message, e);
                     throw e;
                 }
 
@@ -163,7 +164,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
             }
             catch (PlayerAlreadyExists | PlayerDoesntExist | PlayerIsNotInTheGame e) {
                 String message = String.format("Log Validation: Line %d has a problem. %s", logLine.getLineNumber(), e.getMessage());
-                System.out.println(message);
+                logger.warn(message);
             }
         }
 
@@ -240,12 +241,15 @@ public class QuakeLogParserImp implements QuakeLogParser {
         LogEventTypeEnum type;
         String eventName = eventType.replace(":", "");
 
-        //linear search, it´s not the best FIXME
+
         type = allowedEventTypes.get(eventName);
 
         return type;
     }
 
 
+    //TODO adicionar logs
+    //TODO fazer o test6 e passar neste teste, depende então de um ponto que é o id mudar ao reconectar
+    //FIXME considerar os jogadores na partida somente quando ocorrer o begin, anterior a isso ou desconect, tirar o jogador da partida e ir atualizando os dados dele, quando ocorrer o begin, buscar o jogador na partida que estava desconectado e ligar a ele novamente
 
 }

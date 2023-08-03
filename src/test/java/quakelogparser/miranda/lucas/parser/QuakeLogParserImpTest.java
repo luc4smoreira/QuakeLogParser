@@ -162,20 +162,39 @@ class QuakeLogParserImpTest {
             assertTrue(reportGameDTO.getPlayers().contains(playerDTO.getName()), String.format("$s is not present in game report", playerDTO.getName()));
         }
 
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
+    }
 
 
-        System.out.println(gson.toJson(reportWithGames));
-        System.out.println(gson.toJson(reportRankingDTO));
+    @Test
+    public void testParseFileTest6() {
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        GameService gameService = quakeLogParser.parseFile("test6.log");
+
+
+        Map<String, ReportGameDTO> reportWithGames = gameService.generateMatchesReport();
+        assertEquals(1, reportWithGames.size());
+
+        ReportGameDTO reportGameDTO = reportWithGames.values().iterator().next();
+
+        ReportRankingDTO reportRankingDTO = gameService.generateRanking();
+
+        assertEquals(17, reportGameDTO.getTotal_kills());
+        assertEquals(4, reportGameDTO.getKills().get("Zeh"));
+        assertEquals(-1, reportGameDTO.getKills().get("Mal"));
+        assertEquals(12, reportGameDTO.getKills().get("Isgalamido"));
+        assertEquals(0, reportGameDTO.getKills().get("Dono da Bona"));
 
 
 
+        assertEquals(reportGameDTO.getPlayers().size(), reportRankingDTO.getRanking().size());
+
+        //players in matchreport
+        for(PlayerDTO playerDTO : reportRankingDTO.getRanking().values()) {
+            assertTrue(reportGameDTO.getPlayers().contains(playerDTO.getName()), String.format("$s is not present in game report", playerDTO.getName()));
+        }
 
 
     }
-
     @Test
     public void testBatch() {
         try {

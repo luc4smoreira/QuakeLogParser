@@ -59,9 +59,6 @@ public class EventsFactory {
                             String playerName = matcher.group(1);
                             event = new ClientUserinfoChangedEvent(playerId, playerName);
                         }
-                        else {
-                            System.out.println("    -");
-                        }
                     }
                     //else {
                         //nothing to change
