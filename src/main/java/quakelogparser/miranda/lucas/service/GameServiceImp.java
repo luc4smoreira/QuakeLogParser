@@ -1,8 +1,9 @@
 package quakelogparser.miranda.lucas.service;
 
 import quakelogparser.miranda.lucas.dto.GameDTO;
-import quakelogparser.miranda.lucas.dto.GameReportDTO;
+import quakelogparser.miranda.lucas.dto.ReportGameDTO;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
+import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
 import quakelogparser.miranda.lucas.exception.NoGameInitialized;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
@@ -155,8 +156,8 @@ public class GameServiceImp implements GameService {
 
 
     @Override
-    public Map<String, GameReportDTO> generateMatchesReport() {
-        Map<String, GameReportDTO> reports = new LinkedHashMap();
+    public Map<String, ReportGameDTO> generateMatchesReport() {
+        Map<String, ReportGameDTO> reports = new LinkedHashMap();
 
         for(GameDTO gameDTO : matches) {
 
@@ -171,17 +172,36 @@ public class GameServiceImp implements GameService {
 //            }
 
 
-            GameReportDTO gameReportDTO = new GameReportDTO();
+            ReportGameDTO reportGameDTO = new ReportGameDTO();
 
-            gameReportDTO.setTotalKills(gameDTO.getTotalKills());
-            gameReportDTO.setPlayers(gameDTO.getPlayersNames());
-            gameReportDTO.setKills(gameDTO.getPlayersNamesWithKills());
+            reportGameDTO.setTotal_kills(gameDTO.getTotalKills());
+            reportGameDTO.setPlayers(gameDTO.getPlayersNames());
+            reportGameDTO.setKills(gameDTO.getPlayersNamesWithKillsSorted());
 
-            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), gameReportDTO);
+            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), reportGameDTO);
         }
         return reports;
     }
 
+    @Override
+    public Map<String, ReportKillsByMeansDTO> generateKillByMeansReport() {
+        Map<String, ReportKillsByMeansDTO> reports = new LinkedHashMap();
 
+        for(GameDTO gameDTO : matches) {
+//        "game-1": {
+//            "kills_by_means": {
+//                "MOD_SHOTGUN": 10,
+//                "MOD_RAILGUN": 2,
+//                "MOD_GAUNTLET": 1,
+//    ...
+//            }
+//        }
+            ReportKillsByMeansDTO reportKillsByMeansDTO = new ReportKillsByMeansDTO();
+            reportKillsByMeansDTO.setKills_by_means(gameDTO.getKillByMeansWithName());
 
+            reports.put(REPORT_MATCH_PREFIX+gameDTO.getId(), reportKillsByMeansDTO);
+        }
+
+        return reports;
+    }
 }

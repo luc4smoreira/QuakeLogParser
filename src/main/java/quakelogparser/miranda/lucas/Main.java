@@ -1,7 +1,8 @@
 package quakelogparser.miranda.lucas;
 
 import com.google.gson.GsonBuilder;
-import quakelogparser.miranda.lucas.dto.GameReportDTO;
+import quakelogparser.miranda.lucas.dto.ReportGameDTO;
+import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
 import quakelogparser.miranda.lucas.parser.QuakeLogParser;
 import quakelogparser.miranda.lucas.parser.QuakeLogParserImp;
 import quakelogparser.miranda.lucas.service.GameService;
@@ -14,11 +15,16 @@ public class Main {
     public static void main(String[] args) {
 
         QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test1.log");
+        GameService gameService = quakeLogParser.parseFile("qgames.log");
 
-        Map<String, GameReportDTO> report = gameService.generateMatchesReport();
+        Map<String, ReportGameDTO> reportGame= gameService.generateMatchesReport();
+        Map<String, ReportKillsByMeansDTO> reportMeans = gameService.generateKillByMeansReport();
+
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        System.out.println(gson.toJson(report));
+        System.out.println(gson.toJson(reportGame));
+        System.out.println(gson.toJson(reportMeans));
+
 
     }
 }

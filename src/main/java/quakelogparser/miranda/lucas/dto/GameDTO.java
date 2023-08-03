@@ -1,16 +1,14 @@
 package quakelogparser.miranda.lucas.dto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import quakelogparser.miranda.lucas.constants.MeansOfDeathEnum;
+
+import java.util.*;
 
 public class GameDTO {
     private int id;
     private boolean shutdown;
     private int errors;
     private Map<Integer, PlayerDTO> players;
-
     private Map<Integer, Integer> killsByMeans;
     private int totalKills;
 
@@ -40,13 +38,48 @@ public class GameDTO {
         return playersNames;
     }
 
-    public Map<String, Integer> getPlayersNamesWithKills() {
-        Map<String, Integer> playersKills = new HashMap<>();
+    public Map<String, Integer> getPlayersNamesWithKillsSorted() {
+        //LinkedHashMap the insertion order matters
+        Map<String, Integer> playersKills = new LinkedHashMap<>();
+
+        //This list will be used to sort the players in DESC order using kills
+        List<PlayerDTO> playersList = new ArrayList<>();
 
         for(PlayerDTO playerDTO : players.values()) {
+            playersList.add(playerDTO);
+        }
+
+        //Sort the list, because it is a ranking
+        Collections.sort(playersList, new Comparator<PlayerDTO>() {
+            @Override
+            public int compare(PlayerDTO o1, PlayerDTO o2) {
+                return Integer.compare(o2.getKills(), o1.getKills());
+            }
+        });
+
+        for(PlayerDTO playerDTO : playersList) {
             playersKills.put(playerDTO.getName(), playerDTO.getKills());
         }
+
         return playersKills;
+    }
+
+    public Map<String, Integer> getKillByMeansWithName() {
+        Map<String, Integer> killByMeans = new HashMap<>();
+
+
+        //this map is used to know the name associated with each id in killsByMeans
+        Map<Integer, String> mapNameById = new HashMap<>();
+        for(MeansOfDeathEnum meansOfDeathEnum : MeansOfDeathEnum.values()) {
+            mapNameById.put(meansOfDeathEnum.getId(), meansOfDeathEnum.name());
+        }
+
+        for(Map.Entry<Integer, Integer> entry : killsByMeans.entrySet()) {
+           String name = mapNameById.get(entry.getKey());
+           killByMeans.put(name, entry.getValue());
+        }
+
+        return killByMeans;
     }
 
     public void addKill(int meansOfDeath) {

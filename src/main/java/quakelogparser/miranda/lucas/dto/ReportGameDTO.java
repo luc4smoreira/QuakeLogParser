@@ -6,17 +6,17 @@ import java.util.Map;
 /**
  * DTO with data necessary to generate the game report
  */
-public class GameReportDTO {
-    private int totalKills;
+public class ReportGameDTO {
+    private int total_kills;
     private List<String> players;
     private Map<String, Integer> kills;
 
-    public int getTotalKills() {
-        return totalKills;
+    public int getTotal_kills() {
+        return total_kills;
     }
 
-    public void setTotalKills(int totalKills) {
-        this.totalKills = totalKills;
+    public void setTotal_kills(int total_kills) {
+        this.total_kills = total_kills;
     }
 
     public List<String> getPlayers() {

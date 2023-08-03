@@ -28,4 +28,5 @@ class GameServiceTest {
             throw new AssertionError("Should not generate an error", e);
         }
     }
+
 }
