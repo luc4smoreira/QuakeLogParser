@@ -3,16 +3,19 @@ package quakelogparser.miranda.lucas.parser;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
 
 public class LogLine {
-    private String time;
+    private int timeInSeconds;
     private LogEventTypeEnum type;
     private String rawData;
 
-    public String getTime() {
-        return time;
+    private int lineNumber;
+
+
+    public int getTimeInSeconds() {
+        return timeInSeconds;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTimeInSeconds(int timeInSeconds) {
+        this.timeInSeconds = timeInSeconds;
     }
 
     public LogEventTypeEnum getType() {
@@ -29,6 +32,14 @@ public class LogLine {
 
     public void setRawData(String rawData) {
         this.rawData = rawData;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
     }
 
 }

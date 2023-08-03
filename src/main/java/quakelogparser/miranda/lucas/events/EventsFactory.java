@@ -95,8 +95,9 @@ public class EventsFactory {
         //make sure the data from log line is defined.
         if(event!=null) {
             event.setType(logLine.getType());
-            event.setTime(logLine.getTime());
+            event.setTimeInSeconds(logLine.getTimeInSeconds());
             event.setRawData(logLine.getRawData());
+            event.setLineNumber(logLine.getLineNumber());
         }
 
         return event;

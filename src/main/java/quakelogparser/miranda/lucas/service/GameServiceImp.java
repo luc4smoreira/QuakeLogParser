@@ -2,7 +2,7 @@ package quakelogparser.miranda.lucas.service;
 
 import quakelogparser.miranda.lucas.dto.GameDTO;
 import quakelogparser.miranda.lucas.dto.ReportGameDTO;
-import quakelogparser.miranda.lucas.dto.PlayerDTO;
+import quakelogparser.miranda.lucas.dto.PlayerConnectionDTO;
 import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
 import quakelogparser.miranda.lucas.exception.NoGameInitialized;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GameServiceImp implements GameService {
+    private List<PlayerConnectionDTO> ranking;
     private List<GameDTO> matches;
     private GameDTO currentMatch;
 
@@ -31,116 +32,102 @@ public class GameServiceImp implements GameService {
 
     @Override
     public void initGame() {
-        if(currentMatch!=null) {
-            archiveCurrentGame();
-        }
         currentMatch = new GameDTO();
-        currentMatch.setId(matches.size()+1);
+        matches.add(currentMatch);
+        currentMatch.setId(matches.size());
     }
 
     @Override
     public void shutDownGame() {
         validateMatch();
-
-        if(currentMatch!=null) {
-            archiveCurrentGame();
-        }
-        else {
-            throw new RuntimeException();
-        }
         currentMatch = null;
     }
 
-    private void archiveCurrentGame() {
-        if(currentMatch!=null) {
-            matches.add(currentMatch);
-        }
-    }
 
     @Override
     public void playerConnect(int id) throws PlayerAlreadyExists {
         validateMatch();
 
-        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
-        if (playerDTO != null) {
+        PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
+        if (playerConnectionDTO != null) {
 
-            if(playerDTO.isConnected()) {
+            if(playerConnectionDTO.isConnected()) {
                 throw new PlayerAlreadyExists(id);
             }
             else {
-                playerDTO.setConnected(true);
+                playerConnectionDTO.setConnected(true);
             }
         }
         else {
             currentMatch.addNewPlayer(id);
         }
-
     }
+
+
 
     @Override
     public void playerUpdate(int id, String name) throws PlayerDoesntExist {
         validateMatch();
-        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
-        if(playerDTO == null) {
+        PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
+        if(playerConnectionDTO == null) {
             throw new PlayerDoesntExist(id);
         }
-        playerDTO.setName(name);
+        playerConnectionDTO.setName(name);
     }
 
     @Override
     public void playerDisconnect(int id) throws PlayerDoesntExist {
         validateMatch();
 
-        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
-        if(playerDTO == null) {
+        PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
+        if(playerConnectionDTO == null) {
             throw new PlayerDoesntExist(id);
         }
-        playerDTO.setConnected(false);
-        playerDTO.setBegin(false);
+        playerConnectionDTO.setConnected(false);
+        playerConnectionDTO.setBegin(false);
     }
 
     @Override
     public void playerBegin(int id) throws PlayerDoesntExist {
         validateMatch();
 
-        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
-        if(playerDTO == null) {
+        PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
+        if(playerConnectionDTO == null) {
             throw new PlayerDoesntExist(id);
         }
-        playerDTO.setBegin(true);
+        playerConnectionDTO.setBegin(true);
     }
 
     @Override
     public void playerKill(int idKiller, int idVictim, int meansOfDeath) throws PlayerDoesntExist, PlayerIsNotInTheGame {
         validateMatch();
 
-
         //When <world> kill a player, that player loses -1 kill score.
         //Since <world> is not a player, it should not appear in the list of players or in the dictionary of kills.
         //The counter total_kills includes player and world deaths.
 
-        PlayerDTO playerVictimDTO = getAndValidatePlayerInTheGame(idVictim);
+        PlayerConnectionDTO playerVictimDTO = getAndValidatePlayerInTheGame(idVictim);
 
         if(idKiller==WORLD_KILLER_ID) {
             playerVictimDTO.addKills(SCORE_SUICIDE);
             currentMatch.addKill(meansOfDeath);
         }
         else {
-            PlayerDTO playerKillerDTO = getAndValidatePlayerInTheGame(idKiller);
+            PlayerConnectionDTO playerKillerDTO = getAndValidatePlayerInTheGame(idKiller);
             playerKillerDTO.addKills(SCORE_NORMAL_KILL);
             currentMatch.addKill(meansOfDeath);
         }
     }
 
-    private PlayerDTO getAndValidatePlayerInTheGame(int id) throws PlayerDoesntExist, PlayerIsNotInTheGame{
-        PlayerDTO playerDTO = currentMatch.getPlayerById(id);
-        if(playerDTO == null) {
+    private PlayerConnectionDTO getAndValidatePlayerInTheGame(int id) throws PlayerDoesntExist, PlayerIsNotInTheGame {
+        PlayerConnectionDTO playerConnectionDTO = currentMatch.getPlayerById(id);
+        if(playerConnectionDTO == null) {
             throw new PlayerDoesntExist(id);
         }
-        if(!playerDTO.isConnected() || !playerDTO.isBegin()) {
-            throw new PlayerIsNotInTheGame(id);
+        if(!playerConnectionDTO.isConnected() || !playerConnectionDTO.isBegin()) {
+            throw new PlayerIsNotInTheGame(id, playerConnectionDTO.isConnected() , playerConnectionDTO.isBegin());
         }
-        return playerDTO;
+        return playerConnectionDTO;
     }
 
     @Override

@@ -8,7 +8,7 @@ public class GameDTO {
     private int id;
     private boolean shutdown;
     private int errors;
-    private Map<Integer, PlayerDTO> players;
+    private Map<Integer, PlayerConnectionDTO> players;
     private Map<Integer, Integer> killsByMeans;
     private int totalKills;
 
@@ -19,21 +19,21 @@ public class GameDTO {
 
 
 
-    public PlayerDTO getPlayerById(int id) {
+    public PlayerConnectionDTO getPlayerById(int id) {
         return players.get(id);
     }
 
     public void addNewPlayer(int id) {
-        PlayerDTO playerDTO = new PlayerDTO();
-        playerDTO.setId(id);
-        playerDTO.setConnected(true);
-        players.put(id, playerDTO);
+        PlayerConnectionDTO playerConnectionDTO = new PlayerConnectionDTO();
+        playerConnectionDTO.setId(id);
+        playerConnectionDTO.setConnected(true);
+        players.put(id, playerConnectionDTO);
     }
 
     public List<String> getPlayersNames() {
         List<String> playersNames = new ArrayList<>();
-        for(PlayerDTO playerDTO : players.values()) {
-            playersNames.add(playerDTO.getName());
+        for(PlayerConnectionDTO playerConnectionDTO : players.values()) {
+            playersNames.add(playerConnectionDTO.getName());
         }
         return playersNames;
     }
@@ -43,22 +43,22 @@ public class GameDTO {
         Map<String, Integer> playersKills = new LinkedHashMap<>();
 
         //This list will be used to sort the players in DESC order using kills
-        List<PlayerDTO> playersList = new ArrayList<>();
+        List<PlayerConnectionDTO> playersList = new ArrayList<>();
 
-        for(PlayerDTO playerDTO : players.values()) {
-            playersList.add(playerDTO);
+        for(PlayerConnectionDTO playerConnectionDTO : players.values()) {
+            playersList.add(playerConnectionDTO);
         }
 
         //Sort the list, because it is a ranking
-        Collections.sort(playersList, new Comparator<PlayerDTO>() {
+        Collections.sort(playersList, new Comparator<PlayerConnectionDTO>() {
             @Override
-            public int compare(PlayerDTO o1, PlayerDTO o2) {
+            public int compare(PlayerConnectionDTO o1, PlayerConnectionDTO o2) {
                 return Integer.compare(o2.getKills(), o1.getKills());
             }
         });
 
-        for(PlayerDTO playerDTO : playersList) {
-            playersKills.put(playerDTO.getName(), playerDTO.getKills());
+        for(PlayerConnectionDTO playerConnectionDTO : playersList) {
+            playersKills.put(playerConnectionDTO.getName(), playerConnectionDTO.getKills());
         }
 
         return playersKills;
@@ -98,7 +98,7 @@ public class GameDTO {
 
     }
 
-    public Map<Integer, PlayerDTO> getPlayers() {
+    public Map<Integer, PlayerConnectionDTO> getPlayers() {
         return players;
     }
 

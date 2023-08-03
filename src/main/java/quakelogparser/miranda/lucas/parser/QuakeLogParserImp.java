@@ -14,16 +14,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QuakeLogParserImp implements QuakeLogParser {
 
 
     private Map<String, LogEventTypeEnum> allowedEventTypes;
-
+    ;
 
     public QuakeLogParserImp() {
         allowedEventTypes = new HashMap<>();
@@ -38,6 +35,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
         GameService gameService = new GameServiceImp();
 
+
         //open the file and prepare to read it
         InputStream is = Main.class.getClassLoader().getResourceAsStream(fileName);
         InputStreamReader inputStreamReader = new InputStreamReader(is);
@@ -47,80 +45,51 @@ public class QuakeLogParserImp implements QuakeLogParser {
             String rawLine = br.readLine();
 
 
+
+            //it is necessary to group logs by time, and process they ordering by event type
+            // because it is possible to have this scenario:
+
+            //0:04 Kill: 5 3 18: Chessus killed Dono da Bola by MOD_TELEFRAG
+            //0:04 ClientBegin: 5 #it shouldn't be possible to kill someone not int the game
+           List<LogLine> batchLogsByTime = new ArrayList<>();
+           int timeLogsBatch = 0;
+
+
             //read each line, one by one, until the end
-            for(int line = 1; rawLine != null; line++) {
+            for(int lineNumber = 1; rawLine != null; lineNumber++) {
 
                 try {
                     rawLine = rawLine.trim(); //remove spaces at beginning and end
-
                     if(!rawLine.isEmpty()) {
 
                         LogLine logLine = parseLine(rawLine);
 
                         if(logLine!=null && logLine.getType()!=null) {
 
-                            switch (logLine.getType()) {
-                                case INIT_GAME -> {
-                                    gameService.initGame();
-                                }
-                                case SHUT_DOWN_GAME -> {
-                                    gameService.shutDownGame();
-                                }
+                            logLine.setLineNumber(lineNumber);
 
-                                case CLIENT_CONNECT -> {
-                                    ClientConnectEvent clientConnectEvent = (ClientConnectEvent) logLine;
-                                    gameService.playerConnect(clientConnectEvent.getPlayerId());
-                                }
-                                case CLIENT_BEGIN -> {
-                                    ClientBeginEvent clientBeginEvent = (ClientBeginEvent) logLine;
-                                    gameService.playerBegin(clientBeginEvent.getPlayerId());
-                                }
-                                case CLIENT_DISCONNECT -> {
-                                    ClientDisconnectEvent clientDisconnectEvent = (ClientDisconnectEvent) logLine;
-                                    gameService.playerDisconnect(clientDisconnectEvent.getPlayerId());
-
-                                }
-                                case CLIENT_USERINFO_CHANGED -> {
-                                    ClientUserinfoChangedEvent clientUserinfoChangedEvent = (ClientUserinfoChangedEvent) logLine;
-                                    gameService.playerUpdate(clientUserinfoChangedEvent.getPlayerId(), clientUserinfoChangedEvent.getName());
-                                }
-
-                                case ITEM -> {
-                                    //do nothing
-                                }
-                                case EXIT -> {
-                                    //do nothing
-                                }
-                                case KILL -> {
-                                    KillEvent killEvent = (KillEvent) logLine;
-                                    gameService.playerKill(killEvent.getKiller(), killEvent.getVictim(), killEvent.getMeansOfDeath());
-//                                try {
-//                                    int killer = getParamAsInteger(logLine.getEventParam(0));
-//                                    int victim = getParamAsInteger(logLine.getEventParam(1));
-//                                    int meansOfDeath = getParamAsInteger(logLine.getEventParam(2));
-//                                    gameService.playerKill(killer, victim, meansOfDeath);
-//                                }
-//                                catch (NumberFormatException e) {
-//                                    //TODO
-//                                }
-//                                catch (PlayerDoesntExist | PlayerIsNotInTheGame e) {
-//                                    //TODO
-//                                }
-
-                                }
+                            //if is the same time, add to the list to order the list by event type
+                            if(timeLogsBatch == logLine.getTimeInSeconds()) {
+                                batchLogsByTime.add(logLine);
                             }
+                            else {
+                                processLogsSameTime(batchLogsByTime, gameService);
+
+                                batchLogsByTime.clear(); //clear the list
+                                batchLogsByTime.add(logLine); //add the log to the next batch
+                                timeLogsBatch = logLine.getTimeInSeconds(); //update the time associeated with the next batch
+
+                            }
+
                         }
 
                     }
                 }
                 catch (CorruptedLogLine e) {
-                    String message = String.format("Warning: Line %d looks corrupted. %s", line, e.getMessage());
+                    String message = String.format("Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
                     System.out.println(message);
                 }
-                catch (PlayerAlreadyExists | PlayerDoesntExist | PlayerIsNotInTheGame e) {
-                    String message = String.format("Error: Line %d has a problem. %s", line, e.getMessage());
-                    System.out.println(message);
-                }
+
                 rawLine = br.readLine();
             }
 
@@ -130,6 +99,69 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
         return gameService;
     }
+
+    @Override
+    public void processLogsSameTime(List<LogLine> logsGroupedByTime, GameService gameService) {
+
+        if(logsGroupedByTime!=null && logsGroupedByTime.size() > 1) {
+            Collections.sort(logsGroupedByTime, new Comparator<LogLine>() {
+                @Override
+                public int compare(LogLine o1, LogLine o2) {
+                    return Integer.compare(o1.getType().getPriority(), o2.getType().getPriority());
+                }
+            });
+        }
+
+        for(LogLine logLine : logsGroupedByTime) {
+            try {
+                switch (logLine.getType()) {
+                    case INIT_GAME -> {
+                        gameService.initGame();
+                    }
+                    case SHUT_DOWN_GAME -> {
+                        gameService.shutDownGame();
+                    }
+
+                    case CLIENT_CONNECT -> {
+                        ClientConnectEvent clientConnectEvent = (ClientConnectEvent) logLine;
+                        gameService.playerConnect(clientConnectEvent.getPlayerId());
+                    }
+                    case CLIENT_BEGIN -> {
+                        ClientBeginEvent clientBeginEvent = (ClientBeginEvent) logLine;
+                        gameService.playerBegin(clientBeginEvent.getPlayerId());
+                    }
+                    case CLIENT_DISCONNECT -> {
+                        ClientDisconnectEvent clientDisconnectEvent = (ClientDisconnectEvent) logLine;
+                        gameService.playerDisconnect(clientDisconnectEvent.getPlayerId());
+
+                    }
+                    case CLIENT_USERINFO_CHANGED -> {
+                        ClientUserinfoChangedEvent clientUserinfoChangedEvent = (ClientUserinfoChangedEvent) logLine;
+                        gameService.playerUpdate(clientUserinfoChangedEvent.getPlayerId(), clientUserinfoChangedEvent.getName());
+                    }
+
+                    case ITEM -> {
+                        //do nothing
+                    }
+                    case EXIT -> {
+                        //do nothing
+                    }
+                    case KILL -> {
+                        KillEvent killEvent = (KillEvent) logLine;
+                        gameService.playerKill(killEvent.getKiller(), killEvent.getVictim(), killEvent.getMeansOfDeath());
+                    }
+
+                }
+            }
+            catch (PlayerAlreadyExists | PlayerDoesntExist | PlayerIsNotInTheGame e) {
+                String message = String.format("Log Validation: Line %d has a problem. %s", logLine.getLineNumber(), e.getMessage());
+                System.out.println(message);
+            }
+        }
+
+
+    }
+
 
     @Override
     public LogLine parseLine(String rawLine) throws CorruptedLogLine {
@@ -148,7 +180,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
                     logLine = new LogLine();
                     logLine.setRawData(rawLine);
 
-                    logLine.setTime(time);
+                    int timeInSeconds = getTimeInSeconds(time);
+                    logLine.setTimeInSeconds(timeInSeconds);
 
                     LogEventTypeEnum logEventTypeEnum = readEventType(parts[1]);  // event type
 
@@ -174,6 +207,25 @@ public class QuakeLogParserImp implements QuakeLogParser {
             }
         }
         return logLine;
+    }
+
+    private int getTimeInSeconds(String time) throws CorruptedLogLine {
+        int timeInSeconds;
+        String[] timeParts = time.split(":");
+        if(timeParts.length == 2) {
+            try {
+                int minutes = Integer.parseInt(timeParts[0]);
+                int seconds = Integer.parseInt(timeParts[1]);
+                timeInSeconds = minutes * 60 + seconds;
+            }
+            catch (NumberFormatException e) {
+                throw new CorruptedLogLine(String.format("Time invalid, no numbers %s", time));
+            }
+        }
+        else {
+            throw new CorruptedLogLine(String.format("Time invalid %s", time));
+        }
+        return timeInSeconds;
     }
 
     private LogEventTypeEnum readEventType(String eventType) {

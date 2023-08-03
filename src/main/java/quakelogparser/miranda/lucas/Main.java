@@ -17,7 +17,7 @@ public class Main {
         QuakeLogParser quakeLogParser = new QuakeLogParserImp();
         GameService gameService = quakeLogParser.parseFile("qgames.log");
 
-        Map<String, ReportGameDTO> reportGame= gameService.generateMatchesReport();
+        Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         Map<String, ReportKillsByMeansDTO> reportMeans = gameService.generateKillByMeansReport();
 
 
