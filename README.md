@@ -26,7 +26,7 @@ Não ficou claro se o jogador que se desconecta da partida antes dela acabar pre
 
  O jogador pode se desconectar da partida e um novo jogador se reconectar com o mesmo id.  Não ficou claro se é para considerar essa nova conexão como um novo jogador e entra a questão "Jogador se desconecta"  anterior
 
-**Considerei que o jogador que se desconecta e entra na partida novamente utilizando o mesmo id é o mesmo jogador, a contagem dele de kills continuará**
+**Considerei que o jogador que se desconecta e entra na partida novamente utilizando o mesmo nome é o mesmo jogador, a contagem de kills continuará**
 
 
 ### 4. Player Ranking
@@ -42,7 +42,7 @@ Em Report não ficou claro se o ranking dos jogadores seria global de todas as p
 ### 5. Execução e saída
 
 Não ficou claro como deverá ser executado o programa e gerada a saída. 
-**Define que o programa será executado pelo console e gerará a saída também no console**
+**Foi definido que o programa será executado pelo console e gerará a saída também no console**
 
 #### Observação: 
 Dentro do que foi especificado e observando o log, se o jogador se mata durante a partida conta como um kill e ele ficará melhor classificado no ranking se matando.
