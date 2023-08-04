@@ -4,7 +4,27 @@ Autor: Lucas Moreira Carneiro de Miranda
 
 Agosto 2023
 
+## Estrutura
+Os logs são processados linha por linha, agrupando-os pelo mesmo time.
+Caso um erro ocorra, é tratado de forma que o processamento continue caso possível.
+Quando um log não tem um tipo é feito um flush nos logs do mesmo time, enviando-os para processamento.
 
+### Processamento em lote
+Como os logs são processados agrupados por time, foi definida uma prioridade para cada tipo de log dentro do mesmo time, de forma que não seja processado na ordem das linhas sequencialmente. Isso foi feito considerando que em alguns casos pode ocorrer um registro tardio da linha no log após algum evento.
+A enum LogEventTypeEnum define os tipos de log e suas prioridadades, sendo as prioridades mais baixas executadas primeiro
+
+### Dados ignorados
+Alguns tipos de logs são ignorados são eles: Item, Exit
+No evento Kill, são considerados os id do evento e ignorados a texto descritivo do Kill. Na linha de log abaixo, de exemplo
+> 0:05 Kill: 6 7 3: Zeh killed Mal by MOD_MACHINEGUN
+
+O trecho 
+>: Zeh killed Mal by MOD_MACHINEGUN 
+é ignorado
+
+## Means of Death
+Foi criada uma Enum para Means of Death associando um id para cada tipo.
+Como o código de referência indica que existem "meansOfDeath" exclusivos somente se "mission pack" estiver habilibilitado e isso afeta o número associado com o MOD_GRAPPLE. Após analisar o log foi obervado que nenhum meansOfDeath do tipo "mission pack" estava registrado e nem mesmo o MOD_GRAPPLE, então os means of death com id maior que 22 não foram incluídos na enum
 
 ## Lista de decisões tomadas
 
