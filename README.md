@@ -5,12 +5,12 @@ Autor: Lucas Moreira Carneiro de Miranda
 Agosto 2023
 
 ## Estrutura
-Os logs são processados linha por linha, agrupando-os pelo mesmo time.
+Os logs são processados linha por linha, agrupando-os pelo mesmo horário.
 Caso um erro ocorra, é tratado de forma que o processamento continue caso possível.
-Quando um log não tem um tipo é feito um flush nos logs do mesmo time, enviando-os para processamento.
+Quando um log não tem um tipo é feito um flush nos logs do mesmo horário, enviando-os para processamento.
 
 ### Processamento em lote
-Como os logs são processados agrupados por time, foi definida uma prioridade para cada tipo de log dentro do mesmo time, de forma que não seja processado na ordem das linhas sequencialmente. Isso foi feito considerando que em alguns casos pode ocorrer um registro tardio da linha no log após algum evento.
+Como os logs são processados agrupados por horário, foi definida uma prioridade para cada tipo de log dentro do mesmo horário, de forma que não seja processado na ordem das linhas sequencialmente. Isso foi feito considerando que em alguns casos pode ocorrer um registro tardio da linha no log após algum evento.
 A enum LogEventTypeEnum define os tipos de log e suas prioridadades, sendo as prioridades mais baixas executadas primeiro
 
 ### Dados ignorados
