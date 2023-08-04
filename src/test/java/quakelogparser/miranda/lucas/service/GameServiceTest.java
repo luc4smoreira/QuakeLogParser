@@ -7,6 +7,7 @@ import quakelogparser.miranda.lucas.dto.*;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
+import quakelogparser.miranda.lucas.helpers.GameState;
 
 import java.util.Map;
 
@@ -31,12 +32,12 @@ class GameServiceTest {
             gameService.playerKill(GameConstantValues.WORLD_KILLER_ID, 1, MeansOfDeathEnum.MOD_TRIGGER_HURT.getId());
 
             connectUser(2, name2);
-            GameDTO gameDTO = gameService.getCurrentGameData();
+            GameState gameState = gameService.getCurrentGameData();
 
-            PlayerConnectionDTO player1DTO = gameDTO.getPlayerById(1);
+            PlayerConnectionDTO player1DTO = gameState.getPlayerById(1);
             assertEquals(-1, player1DTO.getKills());
 
-            PlayerConnectionDTO player2DTO = gameDTO.getPlayerById(2);
+            PlayerConnectionDTO player2DTO = gameState.getPlayerById(2);
             assertEquals(0, player2DTO.getKills());
 
             Map<String, ReportGameDTO> reports = gameService.generateMatchesReport();

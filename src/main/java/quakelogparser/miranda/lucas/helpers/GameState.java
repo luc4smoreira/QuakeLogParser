@@ -1,22 +1,22 @@
-package quakelogparser.miranda.lucas.dto;
+package quakelogparser.miranda.lucas.helpers;
 
 import quakelogparser.miranda.lucas.constants.MeansOfDeathEnum;
-import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
+import quakelogparser.miranda.lucas.dto.PlayerConnectionDTO;
+import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.service.PlayerHistoryServiceImp;
 
 import java.util.*;
 
-public class GameDTO extends PlayerHistoryServiceImp {
+public class GameState extends PlayerHistoryServiceImp {
     private int id;
     private boolean shutdown;
-    private int errors;
 
     //when the player is connected use id
     private Map<Integer, PlayerConnectionDTO> playersConnected;
     private Map<Integer, Integer> killsByMeans;
     private int totalKills;
 
-    public GameDTO() {
+    public GameState() {
         playersConnected = new HashMap<>();
         killsByMeans = new HashMap<>();
     }
@@ -106,4 +106,7 @@ public class GameDTO extends PlayerHistoryServiceImp {
         return killByMeans;
     }
 
+    public void setShutdown(boolean shutdown) {
+        this.shutdown = shutdown;
+    }
 }

@@ -6,6 +6,7 @@ import quakelogparser.miranda.lucas.exception.NoGameInitialized;
 import quakelogparser.miranda.lucas.exception.PlayerAlreadyExists;
 import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 import quakelogparser.miranda.lucas.exception.PlayerIsNotInTheGame;
+import quakelogparser.miranda.lucas.helpers.GameState;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,8 +16,8 @@ import java.util.Map;
 public class GameServiceImp implements GameService {
 
     private PlayerHistoryService rankingService;
-    private List<GameDTO> matches;
-    private GameDTO currentMatch;
+    private List<GameState> matches;
+    private GameState currentMatch;
 
 
 
@@ -30,7 +31,7 @@ public class GameServiceImp implements GameService {
     @Override
     public void initGame() {
 
-        currentMatch = new GameDTO();
+        currentMatch = new GameState();
         matches.add(currentMatch);
         currentMatch.setId(matches.size());
     }
@@ -38,6 +39,7 @@ public class GameServiceImp implements GameService {
     @Override
     public void shutDownGame() {
         validateMatch();
+        currentMatch.setShutdown(true);
         currentMatch = null;
     }
 
@@ -155,7 +157,7 @@ public class GameServiceImp implements GameService {
     }
 
     @Override
-    public GameDTO getCurrentGameData() {
+    public GameState getCurrentGameData() {
         return currentMatch;
     }
 
@@ -170,7 +172,7 @@ public class GameServiceImp implements GameService {
     public Map<String, ReportGameDTO> generateMatchesReport() {
         Map<String, ReportGameDTO> reports = new LinkedHashMap();
 
-        for(GameDTO gameDTO : matches) {
+        for(GameState gameState : matches) {
 
 //            "game_1": {
 //                "total_kills": 45,
@@ -185,11 +187,11 @@ public class GameServiceImp implements GameService {
 
             ReportGameDTO reportGameDTO = new ReportGameDTO();
 
-            reportGameDTO.setTotal_kills(gameDTO.getTotalKills());
-            reportGameDTO.setPlayers(gameDTO.getPlayersLastNames());
-            reportGameDTO.setKills(gameDTO.getPlayersNamesWithKillsSorted());
+            reportGameDTO.setTotal_kills(gameState.getTotalKills());
+            reportGameDTO.setPlayers(gameState.getPlayersLastNames());
+            reportGameDTO.setKills(gameState.getPlayersNamesWithKillsSorted());
 
-            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+gameDTO.getId(), reportGameDTO);
+            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+ gameState.getId(), reportGameDTO);
         }
         return reports;
     }
@@ -198,7 +200,7 @@ public class GameServiceImp implements GameService {
     public Map<String, ReportKillsByMeansDTO> generateKillByMeansReport() {
         Map<String, ReportKillsByMeansDTO> reports = new LinkedHashMap();
 
-        for(GameDTO gameDTO : matches) {
+        for(GameState gameState : matches) {
 //        "game-1": {
 //            "kills_by_means": {
 //                "MOD_SHOTGUN": 10,
@@ -208,9 +210,9 @@ public class GameServiceImp implements GameService {
 //            }
 //        }
             ReportKillsByMeansDTO reportKillsByMeansDTO = new ReportKillsByMeansDTO();
-            reportKillsByMeansDTO.setKills_by_means(gameDTO.getKillByMeansWithName());
+            reportKillsByMeansDTO.setKills_by_means(gameState.getKillByMeansWithName());
 
-            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+gameDTO.getId(), reportKillsByMeansDTO);
+            reports.put(GameConstantValues.REPORT_MATCH_PREFIX+ gameState.getId(), reportKillsByMeansDTO);
         }
 
         return reports;
