@@ -6,7 +6,7 @@ import quakelogparser.miranda.lucas.exception.PlayerDoesntExist;
 
 import java.util.List;
 
-public interface RankingService {
+public interface PlayerHistoryService {
 
     /**
      * Add the player to the ranking, ignore if already exists.

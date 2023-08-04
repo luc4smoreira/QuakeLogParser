@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class GameServiceImp implements GameService {
 
-    private RankingService rankingService;
+    private PlayerHistoryService rankingService;
     private List<GameDTO> matches;
     private GameDTO currentMatch;
 
@@ -23,7 +23,7 @@ public class GameServiceImp implements GameService {
     public GameServiceImp(){
         matches = new ArrayList<>();
 
-        rankingService = new RankingServiceImp();
+        rankingService = new PlayerHistoryServiceImp();
 
     }
 
@@ -76,9 +76,11 @@ public class GameServiceImp implements GameService {
         String oldName = playerConnectionDTO.getName();
         //if the old name is null so add the player to the ranking
         if(oldName==null || oldName.isEmpty()) {
+            currentMatch.addPlayerIfDoenstExists(name);
             rankingService.addPlayerIfDoenstExists(name);
         }
         else {
+            currentMatch.updateName(oldName, name);
             rankingService.updateName(oldName, name);
         }
 
@@ -98,6 +100,8 @@ public class GameServiceImp implements GameService {
         playerConnectionDTO.setConnected(false);
         playerConnectionDTO.setBegin(false);
         playerConnectionDTO.setName(null); //IMPORTANT! Clear the name to keep the ranking correct
+
+
 
     }
 
@@ -125,7 +129,7 @@ public class GameServiceImp implements GameService {
         if(idKiller == GameConstantValues.WORLD_KILLER_ID) {
             playerVictimDTO.addKills(GameConstantValues.SCORE_SUICIDE);
             currentMatch.addKill(meansOfDeath);
-
+            currentMatch.addPlayerKillScore(playerVictimDTO.getName(), GameConstantValues.SCORE_SUICIDE);
             rankingService.addPlayerKillScore(playerVictimDTO.getName(), GameConstantValues.SCORE_SUICIDE);
         }
         else {
@@ -133,6 +137,7 @@ public class GameServiceImp implements GameService {
             playerKillerDTO.addKills(GameConstantValues.SCORE_NORMAL_KILL);
             currentMatch.addKill(meansOfDeath);
 
+            currentMatch.addPlayerKillScore(playerKillerDTO.getName(), GameConstantValues.SCORE_NORMAL_KILL);
             rankingService.addPlayerKillScore(playerKillerDTO.getName(), GameConstantValues.SCORE_NORMAL_KILL);
         }
 

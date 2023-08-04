@@ -1,9 +1,8 @@
 package quakelogparser.miranda.lucas.parser;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
+import quakelogparser.miranda.lucas.constants.MeansOfDeathEnum;
 import quakelogparser.miranda.lucas.dto.PlayerDTO;
 import quakelogparser.miranda.lucas.dto.ReportGameDTO;
 import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
@@ -71,18 +70,29 @@ class QuakeLogParserImpTest {
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(1, reportGame.size());
-        for(ReportGameDTO reportGameDTO : reportGame.values()) {
-            assertEquals(2, reportGameDTO.getPlayers().size());
-            assertEquals(10, reportGameDTO.getTotal_kills());
 
-            assertEquals(namePlayer2, reportGameDTO.getPlayers().get(0));
-            assertEquals(namePlayer3, reportGameDTO.getPlayers().get(1));
-            assertEquals(-4, reportGameDTO.getKills().get(namePlayer2));
-        }
+        ReportGameDTO reportGameDTO = reportGame.values().iterator().next();
+
+        assertEquals(2, reportGameDTO.getPlayers().size());
+        assertEquals(10, reportGameDTO.getTotal_kills());
+
+        assertEquals(-4, reportGameDTO.getKills().get(namePlayer2));
+        assertEquals(0, reportGameDTO.getKills().get(namePlayer3));
+
+
+        assertEquals(namePlayer3, reportGameDTO.getPlayers().get(0));
+        assertEquals(namePlayer2, reportGameDTO.getPlayers().get(1));
+
 
 
 
         Map<String, ReportKillsByMeansDTO> reportMeans = gameService.generateKillByMeansReport();
+        assertEquals(1, reportMeans.size());
+        ReportKillsByMeansDTO reportKillsByMeansDTO = reportMeans.values().iterator().next();
+
+        assertEquals(6, reportKillsByMeansDTO.getKills_by_means().get(MeansOfDeathEnum.MOD_TRIGGER_HURT.name()));
+        assertEquals(3, reportKillsByMeansDTO.getKills_by_means().get(MeansOfDeathEnum.MOD_ROCKET_SPLASH.name()));
+        assertEquals(1, reportKillsByMeansDTO.getKills_by_means().get(MeansOfDeathEnum.MOD_FALLING.name()));
 
 
     }
@@ -99,14 +109,17 @@ class QuakeLogParserImpTest {
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(1, reportGame.size());
-        for(ReportGameDTO reportGameDTO : reportGame.values()) {
-            assertEquals(3, reportGameDTO.getPlayers().size());
-            assertEquals(11, reportGameDTO.getTotal_kills());
 
-            assertEquals(namePlayer2, reportGameDTO.getPlayers().get(0));
-            assertEquals(namePlayer3, reportGameDTO.getPlayers().get(1));
-            assertEquals(namePlayer4, reportGameDTO.getPlayers().get(2));
-        }
+        ReportGameDTO reportGameDTO = reportGame.values().iterator().next();
+
+        assertEquals(3, reportGameDTO.getPlayers().size());
+        assertEquals(11, reportGameDTO.getTotal_kills());
+
+        assertEquals(2, reportGameDTO.getKills().get(namePlayer2));
+        assertEquals(0, reportGameDTO.getKills().get(namePlayer3));
+        assertEquals(3, reportGameDTO.getKills().get(namePlayer4));
+
+
 
     }
 
@@ -181,9 +194,8 @@ class QuakeLogParserImpTest {
         assertEquals(17, reportGameDTO.getTotal_kills());
         assertEquals(4, reportGameDTO.getKills().get("Zeh"));
         assertEquals(-1, reportGameDTO.getKills().get("Mal"));
-        assertEquals(12, reportGameDTO.getKills().get("Isgalamido"));
-        assertEquals(0, reportGameDTO.getKills().get("Dono da Bona"));
-
+        assertEquals(-10, reportGameDTO.getKills().get("Isgalamido"));
+        assertEquals(0, reportGameDTO.getKills().get("Dono da Bola"));
 
 
         assertEquals(reportGameDTO.getPlayers().size(), reportRankingDTO.getRanking().size());
@@ -192,6 +204,8 @@ class QuakeLogParserImpTest {
         for(PlayerDTO playerDTO : reportRankingDTO.getRanking().values()) {
             assertTrue(reportGameDTO.getPlayers().contains(playerDTO.getName()), String.format("$s is not present in game report", playerDTO.getName()));
         }
+
+
 
 
     }

@@ -9,11 +9,11 @@ import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 
 import java.util.*;
 
-public class RankingServiceImp implements RankingService {
-    private static final Logger logger = LogManager.getLogger(RankingServiceImp.class);
-    private Map<String, PlayerDTO> players;
+public class PlayerHistoryServiceImp implements PlayerHistoryService {
+    private static final Logger logger = LogManager.getLogger(PlayerHistoryServiceImp.class);
+    protected Map<String, PlayerDTO> players;
 
-    public RankingServiceImp() {
+    public PlayerHistoryServiceImp() {
         players = new HashMap<>();
     }
 

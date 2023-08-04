@@ -25,6 +25,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
 
     public QuakeLogParserImp() {
+
         allowedEventTypes = new HashMap<>();
 
         for(LogEventTypeEnum eventType : LogEventTypeEnum.values()) {
@@ -99,7 +100,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                 }
                 catch (NoGameInitialized e) {
                     String message = String.format("Error: Line %d %s", lineNumber, e.getMessage());
-                    logger.error(message, e);
+                    logger.error(message);
                     throw e;
                 }
 
