@@ -1,96 +1,85 @@
-# QuakeLogParser 
-Autor: Lucas Moreira Carneiro de Miranda
+# QuakeLogParser
+Author: Lucas Moreira Carneiro de Miranda
+
+This project aims to process log files from a Quake 3 Arena server and extract information from this log file, generating 3 types of reports:
+- Report with general match data
+- Report grouping the causes of players' deaths in a match
+- Global ranking of players
+
+The project was developed with a focus on the following principles:
+- Extracting data accurately
+- Simplicity and modularity.
+- Test-driven development
 
 
-Este projeto tem como objetivo processar arquivos de log de um servidor de Quake 3 Arena e extrair informações deste arquivo log gerando 3 tipos de relatórios: 
-- Relatório com dados gerais da partida
-- Relatório agrupando as causas da morte dos jogadores em uma partida 
-- Ranking global dos jogadores
-
-O projeto foi desenvolvido com foco nos seguintes princípios:
-- Extrair dados com precisão
-- Simplicidade e modularidade.
-- Desenvolvimento guiado por testes
-
-
-
-
-## Execução
-1. **Baixe o arquivo JAR**: Use [- esse link - https://github.com/luc4smoreira/QuakeLogParser/releases/latest](https://github.com/luc4smoreira/QuakeLogParser/releases/latest) - para baixar o arquivo JAR da última versão:
+## Execution
+1. **Download the JAR file**: Use [- this link - https://github.com/luc4smoreira/QuakeLogParser/releases/latest](https://github.com/luc4smoreira/QuakeLogParser/releases/latest) - to download the latest version of the JAR file.
    
-2. **Instale o Ambiente de Execução Java (JRE)**: Caso ainda não tenha o Java instalado, baixe e instale a partir do [site oficial da Oracle - https://www.java.com/pt-BR/download/](https://www.java.com/pt-BR/download/):
+2. **Install the Java Runtime Environment (JRE)**: If Java is not already installed, download and install it from the [official Oracle site - https://www.java.com/pt-BR/download/](https://www.java.com/pt-BR/download/).
    
-3. **Abra um Terminal no Diretório do Arquivo JAR**: Use o terminal de sua preferência e navegue até o diretório onde o arquivo JAR foi baixado.
+3. **Open a Terminal in the JAR File Directory**: Use the terminal of your preference and navigate to the directory where the JAR file was downloaded.
    
-4. **Execute o Comando**: Digite o comando para executar o aplicativo com parâmetros padrões:
+4. **Execute the Command**: Enter the command to execute the application with default parameters:
 > java -jar QuakeLogParser.jar
 
-5. **Parâmetros Opcionais**: Para ver os parâmetros possíveis e obter ajuda adicional, use o comando:
+5. **Optional Parameters**: To view possible parameters and get additional help, use the command:
 > java -jar QuakeLogParser.jar -help
 
+## Structure
+Logs are processed line by line, grouping them by the same time in a single match. If an error occurs, it is handled in a way that processing continues if possible.
 
-## Estrutura
-Os logs são processados linha por linha, agrupando-os pelo mesmo horário em uma mesma partida.
-Caso um erro ocorra, é tratado de forma que o processamento continue, caso possível.
+### Batch Processing
+As logs are processed grouped by time, a priority was defined for each log type within the same time, so they are not processed in the order of the sequential lines. This was done considering that a late line registration in the log might occur after an event. The enum LogEventTypeEnum defines the log types and their priorities, with lower number priorities being executed first.
 
-### Processamento em lote
-Como os logs são processados agrupados por horário, foi definida uma prioridade para cada tipo de log dentro do mesmo horário, de forma que não seja processado na ordem das linhas sequencialmente. Isso foi feito considerando que em alguns casos pode ocorrer um registro tardio da linha no log após algum evento.
-A enum LogEventTypeEnum define os tipos de log e suas prioridadades, sendo as prioridades com números menores executadas primeiro
-
-### Dados ignorados
-Alguns tipos de logs são ignorados são eles: Item, Exit
-No evento Kill, são considerados os números e é ignorado todo o texto descritivo do Kill. Na linha de log abaixo, por exemplo:
+### Ignored Data
+Some log types are ignored; they are: Item, Exit. In the Kill event, the numbers are considered, and all descriptive text of the Kill is ignored. In the log line below, for example:
 
 > 0:05 Kill: 6 7 3: Zeh killed Mal by MOD_MACHINEGUN
 
-O programa vai considerar somente
+The program will only consider:
 
-
-> 0:05 Kill: 6 7 3: 
-
+> 0:05 Kill: 6 7 3:
 
 ## Means of Death
-Foi criada uma Enum para Means of Death associando um id para cada tipo.
-Como o código de referência indica que existem "meansOfDeath" exclusivos somente se "mission pack" estiver habilitado e isso afeta o número associado com o MOD_GRAPPLE. Após analisar o log foi obervado que nenhum meansOfDeath do tipo "mission pack" estava registrado e nem mesmo o MOD_GRAPPLE, então os means of death com id maior que 22 não foram incluídos na enum
+An Enum was created for Means of Death, associating an id for each type. As the reference code indicates that there are "meansOfDeath" exclusive only if "mission pack" is enabled, and this affects the number associated with MOD_GRAPPLE. After analyzing the log, it was observed that no "mission pack" meansOfDeath were recorded, nor even MOD_GRAPPLE, so the means of death with id greater than 22 were not included in the enum.
 
-## Lista de decisões tomadas
+## List of Decisions Made
 
-### 1. Log corrompido.
+### 1. Corrupted Log
 
-Tem um trecho do arquivo de log que parece estar corrompido, na linha 97 onde deveria ter um horário encontra-se o número 26 seguido de um horário 00:00
+There is a portion of the log file that seems to be corrupted, on line 97 where there should be a time, the number 26 followed by the time 00:00 is found.
 
   > 26 0:00 ------------------------------------------------------------
 
-Considerando esse caso,  foi adicionado um tratamento para falhas e uma mensagem de aviso que pode ser habilitada usando o parâmetro -warnings
+Considering this case, failure handling was added and a warning message can be enabled using the -warnings parameter.
 
-### 2. Jogador se desconecta
+### 2. Player Disconnects
 
-Não ficou claro se o jogador que se desconecta da partida antes dela acabar precisa ser considerado no relatório. 
+It was not clear if the player who disconnects from the match before it ends needs to be considered in the report.
 
-**Tomei a decisão de considerar todos os jogadores, mesmo os que se desconectaram**
+**I made the decision to consider all players, even those who disconnected**
 
-### 3. Reconexão do jogador
+### 3. Player Reconnection
 
- O jogador pode se desconectar da partida e um novo jogador se reconectar com o mesmo id.  Não ficou claro se é para considerar essa nova conexão como um novo jogador e entra a questão "Jogador se desconecta"  anterior
+A player may disconnect from the match and a new player may reconnect with the same id. It was not clear if this new connection should be considered a new player, and the previous "Player Disconnects" question enters.
 
-**Considerei que o jogador que se desconecta e entra na partida novamente utilizando o mesmo nome é o mesmo jogador, a contagem de kills continuará**
-
+**I considered that the player who disconnects and re-enters the match using the same name is the same player; the kill count will continue**
 
 ### 4. Player Ranking
-Em Report não ficou claro se o ranking dos jogadores seria global de todas as partidas ou para cada partida
+
+In Report, it was not clear if the ranking of players would be global for all matches or for each match.
 
   >3.2. Report
   >
   >Create a script that prints a report (grouped information) for each match and a player ranking.
 
-**Foi criado um ranking global de todas as partidas, assumindo como identificador o nome do jogador utilizado**
+**A global ranking of all matches was created, assuming the player's name used as the identifier**
 
+### 5. Execution and Output
 
-### 5. Execução e saída
+It was not clear how the program should be executed and the output generated.
+**It was defined that the program will be executed by the console and will generate the output also in the console**
 
-Não ficou claro como deverá ser executado o programa e gerada a saída. 
-**Foi definido que o programa será executado pelo console e gerará a saída também no console**
-
-#### Observação: 
-Dentro do que foi especificado e observando o log, se o jogador se mata durante a partida conta como um kill e ele ficará melhor classificado no ranking se matando.
- (sem considerar no caso em que WORLD é quem mata)
+#### Observation:
+Within what was specified and observing the log, if the player kills themselves during the match, it counts as a kill, and they will be better ranked by killing themselves.
+(not considering the case where WORLD is the killer)
