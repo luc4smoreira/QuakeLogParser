@@ -4,16 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import quakelogparser.miranda.lucas.Main;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
+import quakelogparser.miranda.lucas.dto.ConfigDTO;
 import quakelogparser.miranda.lucas.events.*;
 import quakelogparser.miranda.lucas.exception.*;
 import quakelogparser.miranda.lucas.helpers.ReportComparatorProvider;
 import quakelogparser.miranda.lucas.service.GameService;
 import quakelogparser.miranda.lucas.service.GameServiceImp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class QuakeLogParserImp implements QuakeLogParser {
@@ -21,6 +19,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
     private static final Logger logger = LogManager.getLogger(QuakeLogParserImp.class);
 
     private Map<String, LogEventTypeEnum> allowedEventTypes;
+
+    private boolean warnings;
 
 
 
@@ -35,26 +35,53 @@ public class QuakeLogParserImp implements QuakeLogParser {
 
     }
 
-    public GameService parseFile(final String fileName) {
+    @Override
+    public GameService parseFile(ConfigDTO configDTO) throws FileNotFoundException {
 
         GameService gameService = new GameServiceImp();
 
 
-        //open the file and prepare to read it
-        InputStream is = Main.class.getClassLoader().getResourceAsStream(fileName);
-        InputStreamReader inputStreamReader = new InputStreamReader(is);
+        this.warnings = configDTO.isShowValidationWarnings();
+
+
+        InputStreamReader inputStreamReader;
+
+        File file = new File(configDTO.getPathToFile());
+
+        //if the file doesn't exit in file system
+        if (!file.exists() || !file.isFile()) {
+            //try to open the file inside the jar
+            InputStream is = Main.class.getClassLoader().getResourceAsStream(configDTO.getPathToFile());
+            inputStreamReader = new InputStreamReader(is);
+        }
+        else {
+            //open the file and prepare to read it
+            FileInputStream fis = new FileInputStream(file);
+            inputStreamReader = new InputStreamReader(fis);
+
+        }
+
+        //if didn't find the file inside jar and in file sytem, throw error
+        if(inputStreamReader==null) {
+            String mesage = String.format(" *** The file was not found: %s", configDTO.getPathToFile());
+            System.out.println(mesage);
+            throw new RuntimeException(mesage);
+        }
+
         BufferedReader br = new BufferedReader(inputStreamReader);
+
+
 
         try (br) {
             String rawLine = br.readLine();
 
 
-
             //it is necessary to group logs by time, and process they ordering by event type
             // because it is possible to have this scenario:
-
             //0:04 Kill: 5 3 18: Chessus killed Dono da Bola by MOD_TELEFRAG
             //0:04 ClientBegin: 5 #it shouldn't be possible to kill someone not int the game
+
+
            List<LogLine> batchLogsByTime = new ArrayList<>();
            int timeLogsBatch = 0;
 
@@ -95,8 +122,10 @@ public class QuakeLogParserImp implements QuakeLogParser {
                     }
                 }
                 catch (CorruptedLogLine e) {
-                    String message = String.format("Validation Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
-                    logger.warn(message);
+                    if(warnings) {
+                        String message = String.format("Validation Warning: Line %d looks corrupted. %s", lineNumber, e.getMessage());
+                        logger.warn(message);
+                    }
                 }
                 catch (NoGameInitialized e) {
                     String message = String.format("Error: Line %d %s", lineNumber, e.getMessage());
@@ -164,8 +193,10 @@ public class QuakeLogParserImp implements QuakeLogParser {
                 }
             }
             catch (PlayerAlreadyExists | PlayerDoesntExist | PlayerIsNotInTheGame e) {
-                String message = String.format("Log Validation: Line %d has a problem. %s", logLine.getLineNumber(), e.getMessage());
-                logger.warn(message);
+                if(warnings) {
+                    String message = String.format("Log Validation: Line %d has a problem. %s", logLine.getLineNumber(), e.getMessage());
+                    logger.warn(message);
+                }
             }
         }
 

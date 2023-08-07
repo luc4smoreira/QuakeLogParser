@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class GameServiceImp implements GameService {
 
-    private PlayerHistoryService rankingService;
-    private List<GameState> matches;
+    private final PlayerHistoryService rankingService;
+    private final List<GameState> matches;
     private GameState currentMatch;
 
 
@@ -170,7 +170,7 @@ public class GameServiceImp implements GameService {
 
     @Override
     public Map<String, ReportGameDTO> generateMatchesReport() {
-        Map<String, ReportGameDTO> reports = new LinkedHashMap();
+        Map<String, ReportGameDTO> reports = new LinkedHashMap<>();
 
         for(GameState gameState : matches) {
 
@@ -198,7 +198,7 @@ public class GameServiceImp implements GameService {
 
     @Override
     public Map<String, ReportKillsByMeansDTO> generateKillByMeansReport() {
-        Map<String, ReportKillsByMeansDTO> reports = new LinkedHashMap();
+        Map<String, ReportKillsByMeansDTO> reports = new LinkedHashMap<>();
 
         for(GameState gameState : matches) {
 //        "game-1": {

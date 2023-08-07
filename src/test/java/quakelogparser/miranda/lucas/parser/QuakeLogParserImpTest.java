@@ -1,18 +1,17 @@
 package quakelogparser.miranda.lucas.parser;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import quakelogparser.miranda.lucas.constants.LogEventTypeEnum;
 import quakelogparser.miranda.lucas.constants.MeansOfDeathEnum;
-import quakelogparser.miranda.lucas.dto.PlayerDTO;
-import quakelogparser.miranda.lucas.dto.ReportGameDTO;
-import quakelogparser.miranda.lucas.dto.ReportKillsByMeansDTO;
-import quakelogparser.miranda.lucas.dto.ReportRankingDTO;
+import quakelogparser.miranda.lucas.dto.*;
 import quakelogparser.miranda.lucas.events.ClientUserinfoChangedEvent;
 import quakelogparser.miranda.lucas.events.KillEvent;
 import quakelogparser.miranda.lucas.exception.CorruptedLogLine;
 import quakelogparser.miranda.lucas.service.GameService;
 import quakelogparser.miranda.lucas.service.GameServiceImp;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class QuakeLogParserImpTest {
 
 
+    private static ConfigDTO configDTO;
+
+    @BeforeAll
+    public static void initialize() {
+        configDTO = new ConfigDTO();
+    }
+
+    private GameService generateGameServiceFromFile(final String file) {
+        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
+        configDTO.setPathToFile(file);
+        GameService gameService;
+        try {
+            gameService = quakeLogParser.parseFile(configDTO);
+        }
+        catch (FileNotFoundException e){
+            throw new AssertionError("Should not generate an error", e);
+        }
+        return gameService;
+
+    }
 
     @Test
     public void testGetName() {
@@ -65,8 +84,10 @@ class QuakeLogParserImpTest {
         final String namePlayer2 = "Isgalamido";
         final String namePlayer3 = "Mocinha";
 
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test1.log");
+
+
+        GameService gameService = generateGameServiceFromFile("test1.log");
+
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(1, reportGame.size());
@@ -104,9 +125,7 @@ class QuakeLogParserImpTest {
         final String namePlayer3 = "Mocinha";
         final String namePlayer4 = "Zeh";
 
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test2.log");
-
+        GameService gameService = generateGameServiceFromFile("test2.log");
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(1, reportGame.size());
 
@@ -127,8 +146,7 @@ class QuakeLogParserImpTest {
 
     @Test
     public void testParseFileTest3() {
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test3.log");
+        GameService gameService = generateGameServiceFromFile("test3.log");
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(1, reportGame.size());
@@ -141,8 +159,7 @@ class QuakeLogParserImpTest {
 
     @Test
     public void testParseFileTest4() {
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test4.log");
+        GameService gameService = generateGameServiceFromFile("test4.log");
 
         Map<String, ReportGameDTO> reportGame = gameService.generateMatchesReport();
         assertEquals(2, reportGame.size());
@@ -152,8 +169,7 @@ class QuakeLogParserImpTest {
 
     @Test
     public void testParseFileTest5() {
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test5.log");
+        GameService gameService = generateGameServiceFromFile("test5.log");
 
 
         Map<String, ReportGameDTO> reportWithGames = gameService.generateMatchesReport();
@@ -180,8 +196,8 @@ class QuakeLogParserImpTest {
 
     @Test
     public void testParseFileTest6() {
-        QuakeLogParser quakeLogParser = new QuakeLogParserImp();
-        GameService gameService = quakeLogParser.parseFile("test6.log");
+
+        GameService gameService = generateGameServiceFromFile("test6.log");
 
 
         Map<String, ReportGameDTO> reportWithGames = gameService.generateMatchesReport();
