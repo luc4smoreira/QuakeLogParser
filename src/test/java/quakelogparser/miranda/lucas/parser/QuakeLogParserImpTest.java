@@ -239,7 +239,7 @@ class QuakeLogParserImpTest {
 
             GameService gameService = new GameServiceImp();
 
-            quakeLogParser.processLogsSameTime(logsSameTime, gameService);
+            quakeLogParser.processLogsFromSameMatchAndTime(logsSameTime, gameService);
 
         } catch (CorruptedLogLine e) {
             throw new RuntimeException(e);

@@ -106,7 +106,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                                 batchLogsByTime.add(logLine);
                             }
                             else {
-                                processLogsSameTime(batchLogsByTime, gameService);
+                                processLogsFromSameMatchAndTime(batchLogsByTime, gameService);
                                 batchLogsByTime.clear(); //clear the list
                                 batchLogsByTime.add(logLine); //add the log to the next batch
                                 timeLogsBatch = logLine.getTimeInSeconds(); //update the time associeated with the next batch
@@ -114,7 +114,7 @@ public class QuakeLogParserImp implements QuakeLogParser {
                         }
                         else {
                             //if there is a line empty or no type like (----) so process the data
-                            processLogsSameTime(batchLogsByTime, gameService);
+                            processLogsFromSameMatchAndTime(batchLogsByTime, gameService);
                             batchLogsByTime.clear(); //clear the list
                         }
 
@@ -144,7 +144,8 @@ public class QuakeLogParserImp implements QuakeLogParser {
     }
 
     @Override
-    public void processLogsSameTime(List<LogLine> logsGroupedByTime, GameService gameService) {
+    public void processLogsFromSameMatchAndTime(List<LogLine> logsGroupedByTime, GameService gameService) {
+
 
         if(logsGroupedByTime!=null && logsGroupedByTime.size() > 1) {
             Collections.sort(logsGroupedByTime, ReportComparatorProvider.getComparadorLogLinesByType());
