@@ -1,8 +1,19 @@
 # QuakeLogParser 
-
 Autor: Lucas Moreira Carneiro de Miranda
 
-Agosto 2023
+
+Este projeto tem como objetivo processar arquivos de log de um servidor de Quake 3 Arena e extrair informações deste arquivo log gerando 3 tipos de relatórios: 
+- Relatório com dados gerais da partida
+- Relatório agrupando as causas da morte dos jogadores em uma partida 
+- Ranking global dos jogadores
+
+O projeto foi desenvolvido com foco nos seguintes princípios:
+- Extrair dados com precisão
+- Simplicidade e modularidade.
+- Desenvolvimento guiado por testes
+
+
+
 
 ## Execução
 1. **Baixe o arquivo JAR**: Use [- esse link - https://github.com/luc4smoreira/QuakeLogParser/releases/latest](https://github.com/luc4smoreira/QuakeLogParser/releases/latest) - para baixar o arquivo JAR da última versão:
