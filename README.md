@@ -6,10 +6,14 @@ Agosto 2023
 
 ## Execução
 1. **Baixe o arquivo JAR**: Use [- esse link - https://github.com/luc4smoreira/QuakeLogParser/releases/latest](https://github.com/luc4smoreira/QuakeLogParser/releases/latest) - para baixar o arquivo JAR da última versão:
-2. **Instale o Ambiente de Execução Java (JRE)**: Caso ainda não tenha o Java instalado, baixe e instale a partir do [site oficial da Oracle - https://www.java.com/pt-BR/download/](https://www.java.com/pt-BR/download/): 
+   
+2. **Instale o Ambiente de Execução Java (JRE)**: Caso ainda não tenha o Java instalado, baixe e instale a partir do [site oficial da Oracle - https://www.java.com/pt-BR/download/](https://www.java.com/pt-BR/download/):
+   
 3. **Abra um Terminal no Diretório do Arquivo JAR**: Use o terminal de sua preferência e navegue até o diretório onde o arquivo JAR foi baixado.
-4. **Execute o Comando**: Digite o seguinte comando a seguir para executar o aplicativo com parâmetros padrões:
+   
+4. **Execute o Comando**: Digite o comando para executar o aplicativo com parâmetros padrões:
 > java -jar QuakeLogParser.jar
+
 5. **Parâmetros Opcionais**: Para ver os parâmetros possíveis e obter ajuda adicional, use o comando:
 > java -jar QuakeLogParser.jar -help
 
@@ -25,8 +29,12 @@ A enum LogEventTypeEnum define os tipos de log e suas prioridadades, sendo as pr
 ### Dados ignorados
 Alguns tipos de logs são ignorados são eles: Item, Exit
 No evento Kill, são considerados os números e é ignorado todo o texto descritivo do Kill. Na linha de log abaixo, por exemplo:
+
 > 0:05 Kill: 6 7 3: Zeh killed Mal by MOD_MACHINEGUN
+
 O programa vai considerar somente
+
+
 > 0:05 Kill: 6 7 3: 
 
 
